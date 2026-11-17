@@ -1,0 +1,42 @@
+Validacao local do Kubernetes - 17/11/2026
+Comando: kubectl -n animecards get pods,svc,deploy,sts,ds,job
+
+NAME                              READY   STATUS      RESTARTS   AGE
+pod/animecards-migrate-xkkgz      0/1     Completed   0          40m
+pod/backend-6fc7cd85b9-99lmg      1/1     Running     0          37m
+pod/cadvisor-g5nlj                1/1     Running     0          30m
+pod/frontend-55c67486f9-kmhr4     1/1     Running     0          34m
+pod/grafana-677f44f9dc-ggh66      1/1     Running     0          5m6s
+pod/mailpit-dd8cd79dc-kgstm       1/1     Running     0          30m
+pod/postgres-0                    1/1     Running     0          42m
+pod/prometheus-67d58bbd5f-z8gm4   1/1     Running     0          33m
+
+NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+service/backend      ClusterIP   10.96.19.187    <none>        3001/TCP            42m
+service/cadvisor     ClusterIP   10.96.200.232   <none>        8080/TCP            42m
+service/frontend     NodePort    10.96.124.57    <none>        3000:30080/TCP      42m
+service/grafana      NodePort    10.96.150.82    <none>        3000:30082/TCP      42m
+service/mailpit      ClusterIP   10.96.96.202    <none>        1025/TCP,8025/TCP   42m
+service/postgres     ClusterIP   10.96.29.34     <none>        5432/TCP            42m
+service/prometheus   ClusterIP   10.96.152.20    <none>        9090/TCP            42m
+
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/backend      1/1     1            1           37m
+deployment.apps/frontend     1/1     1            1           34m
+deployment.apps/grafana      1/1     1            1           33m
+deployment.apps/mailpit      1/1     1            1           30m
+deployment.apps/prometheus   1/1     1            1           33m
+
+NAME                        READY   AGE
+statefulset.apps/postgres   1/1     42m
+
+NAME                      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+daemonset.apps/cadvisor   1         1         1       1            1           <none>          30m
+
+NAME                           STATUS     COMPLETIONS   DURATION   AGE
+job.batch/animecards-migrate   Complete   1/1           2m37s      40m
+
+Comando: kubectl get nodes
+
+NAME                       STATUS   ROLES           AGE   VERSION
+animecards-control-plane   Ready    control-plane   44m   v1.37.0

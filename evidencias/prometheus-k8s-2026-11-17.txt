@@ -1,0 +1,5 @@
+Prometheus no Kubernetes - 17/11/2026
+Alvos:
+animecards-backend: up
+cadvisor: up
+prometheus: up

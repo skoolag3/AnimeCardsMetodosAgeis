@@ -4,13 +4,114 @@
   "schemaVersion": 41,
   "version": 1,
   "refresh": "15s",
-  "time": {"from": "now-1h", "to": "now"},
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "panels": [
-    {"id": 1, "title": "Backend disponivel", "type": "stat", "gridPos": {"x": 0, "y": 0, "w": 6, "h": 8}, "targets": [{"expr": "up{job=\"animecards-backend\"}", "refId": "A"}]},
-    {"id": 2, "title": "Requisicoes por segundo", "type": "timeseries", "gridPos": {"x": 6, "y": 0, "w": 18, "h": 8}, "targets": [{"expr": "sum(rate(animecards_http_requests_total[5m]))", "refId": "A"}]},
-    {"id": 3, "title": "Erros 5xx por segundo", "type": "timeseries", "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}, "targets": [{"expr": "sum(rate(animecards_http_requests_total{status=~\"5..\"}[5m]))", "refId": "A"}]},
-    {"id": 4, "title": "Latencia p95 (s)", "type": "timeseries", "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}, "targets": [{"expr": "histogram_quantile(0.95, sum by (le) (rate(animecards_http_request_duration_seconds_bucket[5m])))", "refId": "A"}]},
-    {"id": 5, "title": "CPU dos containers", "type": "timeseries", "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8}, "targets": [{"expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[5m]))", "refId": "A"}]},
-    {"id": 6, "title": "Memoria dos containers", "type": "timeseries", "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8}, "targets": [{"expr": "sum by (name) (container_memory_working_set_bytes{name!=\"\"})", "refId": "A"}]}
+    {
+      "id": 1,
+      "title": "Backend disponivel",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"animecards-backend\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Requisicoes por segundo",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 18,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(animecards_http_requests_total[5m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Erros 5xx por segundo",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(animecards_http_requests_total{status=~\"5..\"}[5m])) or vector(0)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Latencia p95 (s)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(animecards_http_request_duration_seconds_bucket[5m])))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "CPU dos containers",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (container) (label_replace(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_pod_namespace=\"animecards\",container_label_io_kubernetes_container_name!=\"\"}[5m]), \"container\", \"$1\", \"container_label_io_kubernetes_container_name\", \"(.+)\")) or sum by (container) (label_replace(rate(container_cpu_usage_seconds_total{name=~\"animecardsmetodosageis-.+\"}[5m]), \"container\", \"$1\", \"name\", \"animecardsmetodosageis-(.+)-1\"))",
+          "refId": "A",
+          "legendFormat": "{{container}}"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Memoria dos containers",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (container) (label_replace(container_memory_working_set_bytes{container_label_io_kubernetes_pod_namespace=\"animecards\",container_label_io_kubernetes_container_name!=\"\"}, \"container\", \"$1\", \"container_label_io_kubernetes_container_name\", \"(.+)\")) or sum by (container) (label_replace(container_memory_working_set_bytes{name=~\"animecardsmetodosageis-.+\"}, \"container\", \"$1\", \"name\", \"animecardsmetodosageis-(.+)-1\"))",
+          "refId": "A",
+          "legendFormat": "{{container}}"
+        }
+      ]
+    }
   ]
 }
