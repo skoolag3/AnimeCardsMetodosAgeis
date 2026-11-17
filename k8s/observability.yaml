@@ -6,9 +6,10 @@ spec:
   template:
     metadata: {labels: {app: cadvisor}}
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: cadvisor
-          image: ghcr.io/google/cadvisor:v0.53.0
+          image: ghcr.io/google/cadvisor:v0.60.6
           securityContext: {privileged: true}
           ports: [{containerPort: 8080}]
           volumeMounts:
@@ -16,11 +17,13 @@ spec:
             - {name: varrun, mountPath: /var/run, readOnly: true}
             - {name: sys, mountPath: /sys, readOnly: true}
             - {name: docker, mountPath: /var/lib/docker, readOnly: true}
+            - {name: containerd, mountPath: /var/lib/containerd, readOnly: true}
       volumes:
         - {name: rootfs, hostPath: {path: /}}
         - {name: varrun, hostPath: {path: /var/run}}
         - {name: sys, hostPath: {path: /sys}}
         - {name: docker, hostPath: {path: /var/lib/docker, type: DirectoryOrCreate}}
+        - {name: containerd, hostPath: {path: /var/lib/containerd, type: DirectoryOrCreate}}
 ---
 apiVersion: v1
 kind: Service

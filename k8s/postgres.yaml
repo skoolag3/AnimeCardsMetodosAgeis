@@ -26,7 +26,12 @@ spec:
           ports: [{containerPort: 5432}]
           readinessProbe:
             exec: {command: ["pg_isready", "-U", "animecards", "-d", "animecards"]}
-          volumeMounts: [{name: dados, mountPath: /var/lib/postgresql/data}]
+          volumeMounts:
+            - {name: dados, mountPath: /var/lib/postgresql/data}
+            - {name: init, mountPath: /docker-entrypoint-initdb.d, readOnly: true}
+      volumes:
+        - name: init
+          configMap: {name: postgres-init}
   volumeClaimTemplates:
     - metadata: {name: dados}
       spec:

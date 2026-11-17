@@ -4,6 +4,10 @@ resources:
   - app.yaml
   - observability.yaml
 configMapGenerator:
+  - name: postgres-init
+    namespace: animecards
+    files:
+      - 01-supabase-compat.sql=01-supabase-compat.sql
   - name: prometheus-config
     namespace: animecards
     files:

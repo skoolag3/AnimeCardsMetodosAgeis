@@ -7,13 +7,16 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U animecards -d animecards"]
       interval: 10s
       retries: 10
 
   migrate:
-    build: ./backend
+    build:
+      context: ./backend
+      target: migrate
     command: ["./node_modules/.bin/prisma", "migrate", "deploy"]
     environment: &backend_env
       DATABASE_URL: postgres://animecards:${POSTGRES_PASSWORD}@postgres:5432/animecards
@@ -26,7 +29,9 @@ services:
     restart: "no"
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      target: runtime
     environment: *backend_env
     depends_on:
       migrate:
@@ -49,13 +54,14 @@ services:
         condition: service_healthy
 
   cadvisor:
-    image: ghcr.io/google/cadvisor:v0.53.0
+    image: ghcr.io/google/cadvisor:v0.60.6
     privileged: true
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
+      - /var/lib/containerd:/var/lib/containerd:ro
 
   prometheus:
     image: prom/prometheus:v3.7.3

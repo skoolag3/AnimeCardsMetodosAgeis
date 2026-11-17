@@ -12,7 +12,7 @@ spec:
           command: ["sh", "-c", "until pg_isready -h postgres -U animecards -d animecards; do sleep 2; done"]
       containers:
         - name: migrate
-          image: ghcr.io/skoolag3/animecardsmetodosageis-backend:latest
+          image: ghcr.io/skoolag3/animecardsmetodosageis-migrate:latest
           command: ["./node_modules/.bin/prisma", "migrate", "deploy"]
           envFrom: [{secretRef: {name: animecards-secret}}]
 ---
