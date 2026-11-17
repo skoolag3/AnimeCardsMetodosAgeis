@@ -1,0 +1,615 @@
+"use client";
+
+import { nomeElementoCarta } from "../../components/elementosCarta";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Check,
+  CheckCircle2,
+  Edit3,
+  Heart,
+  Layers,
+  Plus,
+  Save,
+  PanelRightClose,
+  PanelRightOpen,
+  Shield,
+  ShieldCheck,
+  Swords,
+  Trash2,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { CartaMontada } from "../../components/cartaMontada";
+import {
+  notificar,
+  notificarErro,
+  notificarSucesso,
+} from "../../components/notificacoesGlobais";
+import { DetalheCarta } from "../cartas/components/detalheCarta";
+import { ModalFiltrosDeck } from "./modalFiltrosDeck";
+import { ResumoDeck } from "./resumoDeck";
+import { InventarioDeck } from "./inventarioDeck";
+import { ModaisPaginaDecks } from "./modaisPaginaDecks";
+import { useCartasFavoritas } from "../cartas/useCartasFavoritas";
+import { mapearCarta } from "../cartas/cardData";
+import { styles as estilosInventario } from "../cartas/styles";
+import {
+  ativarDeck,
+  atualizarDeck,
+  buscarColecao,
+  criarDeck,
+  excluirDeck,
+  listarDecks,
+  type CartaColecao,
+  type Deck,
+} from "../../lib/jogo";
+import styles from "../../styles/decks.module.css";
+import { obterRaridadeJogo, useRaridadesJogo } from "../../components/raridadesJogo";
+
+const SLOT_COUNT = 6;
+
+function montarSlots(deck: Deck | undefined, cartas: CartaColecao[]) {
+  if (!deck) return Array<CartaColecao | null>(SLOT_COUNT).fill(null);
+
+  const cartasDoDeck = [...deck.cartas]
+    .sort((a, b) => a.posicao - b.posicao)
+    .map((carta) => cartas.find((item) => item.id === carta.id) ?? null);
+
+  return [
+    ...cartasDoDeck,
+    ...Array<CartaColecao | null>(
+      Math.max(0, SLOT_COUNT - cartasDoDeck.length),
+    ).fill(null),
+  ];
+}
+
+export default function DecksPage() {
+  const raridades = useRaridadesJogo();
+  const [decks, setDecks] = useState<Deck[]>([]);
+  const [colecao, setColecao] = useState<CartaColecao[]>([]);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [nome, setNome] = useState("Meu Deck");
+  const [slots, setSlots] = useState<(CartaColecao | null)[]>(
+    Array(SLOT_COUNT).fill(null),
+  );
+  const [slotSelecionado, setSlotSelecionado] = useState(0);
+  const [busca, setBusca] = useState("");
+  const [raridade, setRaridade] = useState("Todas");
+  const [elemento, setElemento] = useState("Todos");
+  const [classe, setClasse] = useState("Todas");
+  const [ordenacao, setOrdenacao] = useState("Raridade");
+  const [somenteFavoritas, setSomenteFavoritas] = useState(false);
+  const [favoritas] = useCartasFavoritas();
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const [inventarioNaLateral, setInventarioNaLateral] = useState(true);
+  const [inventarioModalAberto, setInventarioModalAberto] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [deckParaExcluir, setDeckParaExcluir] = useState<Deck | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
+  const [erro, setErro] = useState("");
+  const [mensagem, setMensagem] = useState("");
+  const [decksAbertos, setDecksAbertos] = useState(false);
+  const [cartaDetalhada, setCartaDetalhada] = useState<CartaColecao | null>(null);
+  const [portalPronto, setPortalPronto] = useState(false);
+  const btnMeusDecks = useRef<HTMLButtonElement>(null);
+  const btnFiltros = useRef<HTMLButtonElement>(null);
+  const btnAbrirInventario = useRef<HTMLButtonElement>(null);
+  const focoAntesDetalhe = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setPortalPronto(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (!decksAbertos) return;
+    const btnMeusDecksAtual = btnMeusDecks.current;
+    const overflowAnterior = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function fecharComEscape(evento: KeyboardEvent) {
+      if (evento.key === "Escape") setDecksAbertos(false);
+    }
+    document.addEventListener("keydown", fecharComEscape);
+    return () => {
+      document.body.style.overflow = overflowAnterior;
+      document.removeEventListener("keydown", fecharComEscape);
+      btnMeusDecksAtual?.focus();
+    };
+  }, [decksAbertos]);
+
+  useEffect(() => {
+    if (!inventarioModalAberto) return;
+    const overflowAnterior = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function fecharComEscape(evento: KeyboardEvent) {
+      if (evento.key === "Escape" && !document.getElementById("titulo-filtros-deck")) setInventarioModalAberto(false);
+    }
+    document.addEventListener("keydown", fecharComEscape);
+    return () => {
+      document.body.style.overflow = overflowAnterior;
+      document.removeEventListener("keydown", fecharComEscape);
+      btnAbrirInventario.current?.focus();
+    };
+  }, [inventarioModalAberto]);
+
+  useEffect(() => {
+    if (!cartaDetalhada) return;
+    const overflowAnterior = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function fecharComEscape(evento: KeyboardEvent) {
+      if (evento.key === "Escape") setCartaDetalhada(null);
+    }
+    document.addEventListener("keydown", fecharComEscape);
+    return () => {
+      document.body.style.overflow = overflowAnterior;
+      document.removeEventListener("keydown", fecharComEscape);
+      focoAntesDetalhe.current?.focus();
+    };
+  }, [cartaDetalhada]);
+
+  useEffect(() => {
+    if (erro) notificarErro(erro);
+  }, [erro]);
+
+  useEffect(() => {
+    if (!mensagem) return;
+    if (mensagem.startsWith("Editando")) {
+      notificar({ mensagem, titulo: "Construtor de decks", tipo: "info" });
+      return;
+    }
+    if (mensagem.includes("cheio")) {
+      notificar({ mensagem, titulo: "Deck completo", tipo: "aviso" });
+      return;
+    }
+    notificarSucesso(mensagem);
+  }, [mensagem]);
+
+  const carregar = useCallback(async () => {
+    setCarregando(true);
+    setErro("");
+    try {
+      const [decksData, colecaoData] = await Promise.all([
+        listarDecks(),
+        buscarColecao(),
+      ]);
+      setDecks(decksData);
+      const cartasObtidas = colecaoData.itens.filter((carta) => carta.obtida);
+      const deckEquipado = decksData.find((deck) => deck.ativo);
+      const parametros = new URLSearchParams(window.location.search);
+      const deckInicialId = parametros.get("deck");
+      const deckInicial = decksData.find((deck) => deck.id === deckInicialId);
+      const deckSelecionado = deckInicial ?? deckEquipado;
+      const slotsIniciais = montarSlots(deckSelecionado, cartasObtidas);
+      setColecao(cartasObtidas);
+      setEditandoId(deckSelecionado?.id ?? null);
+      setNome(deckSelecionado?.nome ?? "Meu Deck");
+
+      const cartaInicialId = parametros.get("carta");
+      const cartaInicial = colecaoData.itens.find(
+        (carta) => carta.id === cartaInicialId && carta.obtida,
+      );
+      if (cartaInicial) {
+        if (!slotsIniciais.some((carta) => carta?.id === cartaInicial.id)) {
+          const primeiroVazio = slotsIniciais.findIndex((carta) => !carta);
+          if (primeiroVazio >= 0) {
+            slotsIniciais[primeiroVazio] = cartaInicial;
+            setSlotSelecionado(primeiroVazio);
+            setMensagem(
+              `${cartaInicial.nome} foi adicionada ao deck equipado.`,
+            );
+          } else {
+            setMensagem(
+              "O deck equipado está cheio. Remova uma carta antes de adicionar outra.",
+            );
+          }
+        }
+      }
+      setSlots(slotsIniciais);
+    } catch (error) {
+      setErro(
+        error instanceof Error ? error.message : "Erro ao carregar decks.",
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void carregar();
+  }, [carregar]);
+
+  const cartasFiltradas = useMemo(() => {
+    const termo = busca.trim().toLocaleLowerCase("pt-BR");
+    const res = colecao.filter(
+      (carta) =>
+        (!termo ||
+          carta.nome.toLocaleLowerCase("pt-BR").includes(termo) ||
+          carta.elemento.toLocaleLowerCase("pt-BR").includes(termo) ||
+          carta.classe.toLocaleLowerCase("pt-BR").includes(termo)) &&
+        (raridade === "Todas" || carta.raridade === raridade) &&
+        (elemento === "Todos" || carta.elemento === elemento) &&
+        (classe === "Todas" || carta.classe === classe) &&
+        (!somenteFavoritas || favoritas.has(carta.nome)),
+    );
+    return [...res].sort((a, b) => {
+      if (ordenacao === "Raridade") return (obterRaridadeJogo(raridades, b.raridade)?.ordem ?? 0) - (obterRaridadeJogo(raridades, a.raridade)?.ordem ?? 0);
+      if (ordenacao === "HP") return b.hpBase - a.hpBase;
+      if (ordenacao === "Ataque") return b.danoBase - a.danoBase;
+      if (ordenacao === "Defesa") return b.defesaBase - a.defesaBase;
+      if (ordenacao === "Valor de venda") return b.custo - a.custo;
+      const dataA = a.obtidaEm ? new Date(a.obtidaEm).getTime() : 0;
+      const dataB = b.obtidaEm ? new Date(b.obtidaEm).getTime() : 0;
+      return ordenacao === "Mais recentes" ? dataB - dataA : dataA - dataB;
+    });
+  }, [busca, classe, colecao, elemento, favoritas, ordenacao, raridade, raridades, somenteFavoritas]);
+
+  const cartasSelecionadas = slots.filter((carta): carta is CartaColecao =>
+    Boolean(carta),
+  );
+  const deckCompleto = cartasSelecionadas.length >= 1;
+  const deckSalvo = decks.find((deck) => deck.id === editandoId) ?? decks.find((deck) => deck.ativo);
+  const slotsSalvos = montarSlots(deckSalvo, colecao);
+  const alteracoesPendentes = nome !== (deckSalvo?.nome ?? "Meu Deck") ||
+    slots.some((carta, index) => carta?.id !== slotsSalvos[index]?.id);
+
+  function novoDeck() {
+    setDecksAbertos(false);
+    setEditandoId(null);
+    setNome(`Meu Deck ${decks.length + 1}`);
+    setSlots(Array(SLOT_COUNT).fill(null));
+    setSlotSelecionado(0);
+    setErro("");
+    setMensagem("");
+  }
+
+  function editar(deck: Deck) {
+    setDecksAbertos(false);
+    setEditandoId(deck.id);
+    setNome(deck.nome);
+    setSlots(montarSlots(deck, colecao));
+    setSlotSelecionado(0);
+    setErro("");
+    setMensagem(`Editando ${deck.nome}.`);
+  }
+
+  function selecionarCarta(carta: CartaColecao) {
+    setErro("");
+    if (slots.some((item) => item?.id === carta.id)) {
+      setErro("Essa carta ja esta no deck.");
+      return;
+    }
+    const proximos = [...slots];
+    proximos[slotSelecionado] = carta;
+    setSlots(proximos);
+    const proximoVazio = proximos.findIndex((item) => !item);
+    if (proximoVazio >= 0) setSlotSelecionado(proximoVazio);
+  }
+
+  function removerCarta(index: number) {
+    const proximos = [...slots];
+    proximos[index] = null;
+    setSlots(proximos);
+    setSlotSelecionado(index);
+  }
+
+  function cancelarEdicao() {
+    setEditandoId(deckSalvo?.id ?? null);
+    setNome(deckSalvo?.nome ?? "Meu Deck");
+    setSlots(slotsSalvos);
+    setSlotSelecionado(0);
+    setErro("");
+    setMensagem("");
+  }
+
+  async function salvar(ativar: boolean) {
+    const nomeLimpo = nome.trim();
+    if (nomeLimpo.length < 3) {
+      setErro("O nome do deck precisa ter pelo menos 3 caracteres.");
+      return;
+    }
+    if (ativar && !deckCompleto) {
+      setErro("Adicione pelo menos uma carta antes de salvar e equipar.");
+      return;
+    }
+
+    setSalvando(true);
+    setErro("");
+    setMensagem("");
+    try {
+      const ids = cartasSelecionadas.map((carta) => carta.id);
+      const resposta = editandoId
+        ? await atualizarDeck(editandoId, {
+            nome: nomeLimpo,
+            cartas: ids,
+            ativar,
+          })
+        : await criarDeck(nomeLimpo, ids, ativar);
+      setEditandoId(resposta.deck.id);
+      setMensagem(ativar ? "Deck salvo e equipado." : resposta.message);
+      setDecks(await listarDecks());
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Erro ao salvar deck.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  async function equiparDeck(deck: Deck) {
+    setErro("");
+    setMensagem("");
+    try {
+      await ativarDeck(deck.id);
+      const decksAtualizados = await listarDecks();
+      const deckEquipado = decksAtualizados.find((item) => item.ativo) ?? deck;
+      setDecks(decksAtualizados);
+      setEditandoId(deckEquipado.id);
+      setNome(deckEquipado.nome);
+      setSlots(montarSlots(deckEquipado, colecao));
+      setSlotSelecionado(0);
+      setMensagem("Deck equipado com sucesso.");
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Erro ao equipar deck.");
+    }
+  }
+
+  async function confirmarExclusao() {
+    if (!deckParaExcluir || excluindo) return;
+    const deck = deckParaExcluir;
+    setExcluindo(true);
+    setErro("");
+    try {
+      const resposta = await excluirDeck(deck.id);
+      setMensagem(resposta.message);
+      if (editandoId === deck.id) novoDeck();
+      setDecks(await listarDecks());
+      setDeckParaExcluir(null);
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Erro ao excluir deck.");
+    } finally {
+      setExcluindo(false);
+    }
+  }
+
+  if (carregando) {
+    return <main className={styles.estado}>Carregando seus decks...</main>;
+  }
+
+  return (
+    <main className={styles.pagina}>
+      <header className={styles.topo}>
+        <div>
+          <Link href="/cartas" className={styles.voltar}>
+            <ArrowLeft aria-hidden="true" /> Voltar à coleção
+          </Link>
+          <h1>Construtor de decks</h1>
+          <p>Monte e equipe o deck que será usado nas partidas.</p>
+        </div>
+      </header>
+
+      <div className={`${styles.layout} ${inventarioNaLateral ? "" : styles.layoutSemLateral}`}>
+        <section className={styles.editor} data-guia="deck">
+          <div className={styles.acoesEditor}>
+            <button
+              ref={btnMeusDecks}
+              type="button"
+              className={styles.btnMeusDecks}
+              onClick={() => setDecksAbertos(true)}
+              aria-haspopup="dialog"
+            >
+              <Layers aria-hidden="true" />
+              Meus decks <span>{decks.length}</span>
+            </button>
+            <div className={styles.modosInventario} aria-label="Modo de exibição do inventário">
+              {!inventarioNaLateral && (
+                <button
+                  ref={btnAbrirInventario}
+                  type="button"
+                  onClick={() => setInventarioModalAberto(true)}
+                  aria-haspopup="dialog"
+                >
+                  <Layers aria-hidden="true" /> Inventário
+                </button>
+              )}
+              <button
+                type="button"
+                className={styles.btnAlternarInventario}
+                onClick={() => {
+                  setInventarioNaLateral((atual) => !atual);
+                  setInventarioModalAberto(false);
+                }}
+                aria-label={inventarioNaLateral ? "Ocultar barra lateral do inventário" : "Mostrar barra lateral do inventário"}
+                title={inventarioNaLateral ? "Ocultar barra lateral" : "Mostrar barra lateral"}
+                aria-pressed={inventarioNaLateral}
+              >
+                {inventarioNaLateral ? <PanelRightClose aria-hidden="true" /> : <PanelRightOpen aria-hidden="true" />}
+              </button>
+            </div>
+          </div>
+          <ResumoDeck cartas={cartasSelecionadas} />
+          <div className={styles.editorTopo}>
+            <label>
+              Nome do deck
+              <input
+                value={nome}
+                onChange={(event) => setNome(event.target.value)}
+                maxLength={100}
+              />
+            </label>
+            <div
+              className={
+                deckCompleto ? styles.validacaoOk : styles.validacaoPendente
+              }
+            >
+              <ShieldCheck aria-hidden="true" />
+              <span>
+                <strong>
+                  {deckCompleto ? "Deck válido" : "Adicione uma carta"}
+                </strong>
+                {cartasSelecionadas.length}/6 cartas únicas
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.slots}>
+            {slots.map((carta, index) => (
+              <button
+                type="button"
+                key={index}
+                className={`${styles.slot} ${carta ? styles.slotPreenchido : ""} ${slotSelecionado === index ? styles.slotAtivo : ""}`}
+                onClick={() => {
+                  setSlotSelecionado(index);
+                  if (carta) {
+                    focoAntesDetalhe.current = document.activeElement as HTMLElement;
+                    setCartaDetalhada(carta);
+                  } else if (!inventarioNaLateral) {
+                    setInventarioModalAberto(true);
+                  }
+                }}
+                aria-label={carta ? `Ver detalhes de ${carta.nome}` : `Selecionar slot ${index + 1}`}
+              >
+                {!carta ? <span className={styles.numero}>{index + 1}</span> : null}
+                {carta ? (
+                  <>
+                    <span className={styles.slotCartaVisual}>
+                      <CartaMontada
+                        arte={carta.foto ?? undefined}
+                        moldura={carta.moldura ?? undefined}
+                        nome={carta.nome}
+                        raridade={carta.raridade}
+                        elemento={carta.elemento}
+                        config={carta.configVisual ?? undefined}
+                        placeholder={<Layers aria-hidden="true" />}
+                      />
+                    </span>
+                    <span className={styles.slotCartaInfo}>
+                      <span className={styles.slotCartaNome}>
+                        <strong>{carta.nome}</strong>
+                        <small>
+                          {obterRaridadeJogo(raridades, carta.raridade)?.nome ?? carta.raridade} · {nomeElementoCarta(carta.elemento)}
+                        </small>
+                      </span>
+                      <span className={styles.slotCartaStats}>
+                        <span title="Pontos de vida">
+                          <Heart aria-hidden="true" />
+                          <b>{carta.hpBase}</b>
+                        </span>
+                        <span title="Ataque">
+                          <Swords aria-hidden="true" />
+                          <b>{carta.danoBase}</b>
+                        </span>
+                        <span title="Defesa">
+                          <Shield aria-hidden="true" />
+                          <b>{carta.defesaBase}</b>
+                        </span>
+                      </span>
+                      <small>{carta.classe}</small>
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className={styles.remover}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removerCarta(index);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          removerCarta(index);
+                        }
+                      }}
+                      aria-label={`Remover ${carta.nome}`}
+                    >
+                      <X aria-hidden="true" />
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Plus aria-hidden="true" />
+                    <strong>Slot vazio</strong>
+                    <small>Selecione uma carta</small>
+                  </>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.salvarAcoes}>
+            <button
+              type="button"
+              className={`${styles.rascunho} ${alteracoesPendentes ? styles.cancelarAlterado : ""}`}
+              disabled={salvando}
+              onClick={cancelarEdicao}
+            >
+              <X aria-hidden="true" /> Cancelar
+            </button>
+            <button
+              type="button"
+              className={styles.ativar}
+              disabled={salvando || !deckCompleto}
+              onClick={() => void salvar(true)}
+            >
+              <Save aria-hidden="true" /> Salvar
+            </button>
+          </div>
+        </section>
+        {inventarioNaLateral && (
+          <InventarioDeck
+            cartas={cartasFiltradas}
+            cartasNoDeck={new Set(cartasSelecionadas.map((carta) => carta.id))}
+            busca={busca}
+            setBusca={setBusca}
+            filtrosAtivos={raridade !== "Todas" || elemento !== "Todos" || classe !== "Todas" || ordenacao !== "Raridade" || somenteFavoritas}
+            btnFiltros={btnFiltros}
+            aoAbrirFiltros={() => setFiltrosAbertos(true)}
+            aoSelecionar={selecionarCarta}
+          />
+        )}
+      </div>
+
+      <ModaisPaginaDecks
+        portalPronto={portalPronto}
+        inventarioModalAberto={inventarioModalAberto}
+        setInventarioModalAberto={setInventarioModalAberto}
+        setInventarioNaLateral={setInventarioNaLateral}
+        cartasFiltradas={cartasFiltradas}
+        cartasSelecionadasIds={new Set(cartasSelecionadas.map((carta) => carta.id))}
+        busca={busca}
+        setBusca={setBusca}
+        filtrosAtivos={raridade !== "Todas" || elemento !== "Todos" || classe !== "Todas" || ordenacao !== "Raridade" || somenteFavoritas}
+        btnFiltros={btnFiltros}
+        setFiltrosAbertos={setFiltrosAbertos}
+        selecionarCarta={selecionarCarta}
+        filtrosAbertos={filtrosAbertos}
+        raridade={raridade}
+        elemento={elemento}
+        classe={classe}
+        ordenacao={ordenacao}
+        somenteFavoritas={somenteFavoritas}
+        setRaridade={setRaridade}
+        setElemento={setElemento}
+        setClasse={setClasse}
+        setOrdenacao={setOrdenacao}
+        setSomenteFavoritas={setSomenteFavoritas}
+        decksAbertos={decksAbertos}
+        setDecksAbertos={setDecksAbertos}
+        decks={decks}
+        editandoId={editandoId}
+        novoDeck={novoDeck}
+        editar={editar}
+        equiparDeck={equiparDeck}
+        setDeckParaExcluir={setDeckParaExcluir}
+        cartaDetalhada={cartaDetalhada}
+        setCartaDetalhada={setCartaDetalhada}
+        deckParaExcluir={deckParaExcluir}
+        excluindo={excluindo}
+        confirmarExclusao={confirmarExclusao}
+      />
+    </main>
+  );
+}

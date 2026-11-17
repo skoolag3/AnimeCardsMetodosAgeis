@@ -1,0 +1,635 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id                               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome                             String    @db.VarChar(100)
+  email                            String    @unique @db.VarChar(255)
+  senha_hash                       String    @db.VarChar(255)
+  senha_definida                   Boolean   @default(true)
+  email_verificado                 Boolean   @default(false)
+  token_verificacao_email          String?   @unique @db.VarChar(255)
+  token_verificacao_expira_em      DateTime? @db.Timestamptz(0)
+  token_redefinicao_senha          String?   @unique @db.VarChar(255)
+  token_redefinicao_expira_em      DateTime? @db.Timestamptz(0)
+  email_pendente                   String?   @db.VarChar(255)
+  token_confirmacao_troca_email    String?   @unique @db.VarChar(255)
+  token_troca_email_expira_em      DateTime? @db.Timestamptz(0)
+  token_verificacao_email_pendente String?   @unique @db.VarChar(255)
+  token_email_pendente_expira_em   DateTime? @db.Timestamptz(0)
+  bloqueado                        Boolean?  @default(false)
+  tentativas_login                 Int?      @default(0)
+  is_admin                         Boolean?  @default(false)
+  nivel                            Int?      @default(1)
+  pontos_experiencia               Int?      @default(0)
+  saldo_rubys_cache                Int?      @default(0)
+  ativo                            Boolean?  @default(true)
+  criado_em                        DateTime? @default(now()) @db.Timestamptz(0)
+  atualizado_em                    DateTime? @default(now()) @db.Timestamptz(0)
+  excluido_em                      DateTime? @db.Timestamptz(0)
+  ultimo_login_em                  DateTime? @db.Timestamptz(0)
+  ultima_recompensa_semanal_em     DateTime? @db.Timestamptz(0)
+  desativado_em                    DateTime? @db.Timestamptz(0)
+  exclusao_agendada_em             DateTime? @db.Timestamptz(0)
+
+  perfil               PerfilUsuario?
+  provedores           ProvedorUsuario[]
+  molduras             UsuarioMoldura[]
+  solicitacoesExclusao SolicitacaoExclusao[]
+  transacoes           LogTransacao[]
+  ledgerRubys          LedgerRuby[]
+  gachaLogs            LogGacha[]
+  bannerColetas        UsuarioBannerColeta[]
+  correioLeituras      CorreioLeitura[]
+  inventarios          Inventario[]
+  decks                Deck[]
+  partidas             LogPartida[]          @relation("PartidasUsuario")
+  partidasComoOponente LogPartida[]          @relation("PartidasOponente")
+  expedicoes           Expedicao[]
+  logsAdminComoAutor   LogAdminUsuario[]     @relation("LogAdminAutor")
+  logsAdminComoAlvo    LogAdminUsuario[]     @relation("LogAdminAlvo")
+  logsAdminCartas       LogAdminCarta[]
+
+  @@map("usuario")
+}
+
+model CorreioLeitura {
+  id_usuario String   @db.Uuid
+  chave      String   @db.VarChar(150)
+  lido_em    DateTime @default(now()) @db.Timestamptz(0)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+
+  @@id([id_usuario, chave])
+  @@index([id_usuario, lido_em(sort: Desc)])
+  @@map("correio_leitura")
+}
+
+model PerfilUsuario {
+  id_usuario           String   @id @db.Uuid
+  biografia            String   @default("") @db.VarChar(280)
+  avatar_url           String?  @db.VarChar(500)
+  banner_url           String?  @db.VarChar(500)
+  id_moldura           String?  @db.Uuid
+  id_carta_moldura     String?  @db.Uuid
+  receber_notificacoes Boolean  @default(true)
+  mostrar_no_ranking   Boolean  @default(true)
+  ocultar_historico    Boolean  @default(false)
+  criado_em            DateTime @default(now()) @db.Timestamptz(0)
+  atualizado_em        DateTime @default(now()) @db.Timestamptz(0)
+
+  usuario                 Usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  molduraSelecionada      Moldura? @relation(fields: [id_moldura], references: [id])
+  cartaMolduraSelecionada Carta?   @relation("CartaMolduraPerfil", fields: [id_carta_moldura], references: [id], onDelete: SetNull)
+
+  @@index([id_carta_moldura])
+  @@map("perfil_usuario")
+}
+
+model Moldura {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug       String   @unique @db.VarChar(80)
+  nome       String   @db.VarChar(100)
+  descricao  String?  @db.VarChar(255)
+  classe_css String   @db.VarChar(80)
+  ativo      Boolean  @default(true)
+  criado_em  DateTime @default(now()) @db.Timestamptz(0)
+
+  perfis   PerfilUsuario[]
+  usuarios UsuarioMoldura[]
+
+  @@map("moldura")
+}
+
+model UsuarioMoldura {
+  id_usuario String   @db.Uuid
+  id_moldura String   @db.Uuid
+  obtido_em  DateTime @default(now()) @db.Timestamptz(0)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  moldura Moldura @relation(fields: [id_moldura], references: [id], onDelete: Cascade)
+
+  @@id([id_usuario, id_moldura])
+  @@map("usuario_moldura")
+}
+
+model ProvedorUsuario {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario      String    @db.Uuid
+  provedor        String    @db.VarChar(30)
+  id_provedor     String    @db.VarChar(255)
+  email_provedor  String?   @db.VarChar(255)
+  criado_em       DateTime  @default(now()) @db.Timestamptz(0)
+  ultimo_login_em DateTime? @db.Timestamptz(0)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+
+  @@unique([provedor, id_provedor])
+  @@unique([id_usuario, provedor])
+  @@map("provedor_usuario")
+}
+
+model SolicitacaoExclusao {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario    String    @db.Uuid
+  status        String    @default("AGENDADA") @db.VarChar(30)
+  solicitada_em DateTime  @default(now()) @db.Timestamptz(0)
+  executar_apos DateTime  @db.Timestamptz(0)
+  cancelada_em  DateTime? @db.Timestamptz(0)
+  executada_em  DateTime? @db.Timestamptz(0)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+
+  @@index([status, executar_apos])
+  @@map("solicitacao_exclusao")
+}
+
+model PacoteRuby {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_stripe        String    @unique @db.VarChar(255)
+  nome             String    @db.VarChar(100)
+  quantidade_rubys Int
+  preco_brl        Decimal   @db.Decimal(10, 2)
+  ativo            Boolean?  @default(true)
+  criado_em        DateTime? @default(now()) @db.Timestamptz(0)
+  atualizado_em    DateTime? @default(now()) @db.Timestamptz(0)
+
+  transacoes LogTransacao[]
+
+  @@map("pacote_ruby")
+}
+
+model LogTransacao {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario       String?   @db.Uuid
+  id_pacote        String?   @db.Uuid
+  valor_brl        Decimal   @db.Decimal(10, 2)
+  status_pagamento String    @db.VarChar(50)
+  id_stripe_intent String?   @db.VarChar(255)
+  timestamp_compra DateTime? @default(now()) @db.Timestamptz(0)
+
+  usuario Usuario?    @relation(fields: [id_usuario], references: [id])
+  pacote  PacoteRuby? @relation(fields: [id_pacote], references: [id])
+
+  @@index([id_usuario], map: "idx_log_transacao_usuario")
+  @@map("log_transacao")
+}
+
+model LedgerRuby {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario    String    @db.Uuid
+  quantidade    Int
+  motivo        String    @db.VarChar(50)
+  id_referencia String?   @db.Uuid
+  descricao     String?
+  criado_em     DateTime? @default(now()) @db.Timestamptz(0)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+
+  @@index([id_usuario], map: "idx_ledger_ruby_usuario")
+  @@map("ledger_ruby")
+}
+
+model LogAdminUsuario {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_admin   String   @db.Uuid
+  id_usuario String   @db.Uuid
+  acao       String   @db.VarChar(50)
+  categoria  String   @db.VarChar(30)
+  descricao  String   @db.VarChar(255)
+  detalhes   Json?
+  criado_em  DateTime @default(now()) @db.Timestamptz(0)
+
+  admin   Usuario @relation("LogAdminAutor", fields: [id_admin], references: [id], onDelete: Restrict)
+  usuario Usuario @relation("LogAdminAlvo", fields: [id_usuario], references: [id], onDelete: Cascade)
+
+  @@index([id_admin, criado_em(sort: Desc)])
+  @@index([id_usuario, criado_em(sort: Desc)])
+  @@map("log_admin_usuario")
+}
+
+model LogAdminCarta {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_carta   String   @db.Uuid
+  nome_carta String   @db.VarChar(150)
+  id_admin   String?  @db.Uuid
+  acao       String   @db.VarChar(20)
+  alteracoes Json?
+  criado_em  DateTime @default(now()) @db.Timestamptz(0)
+
+  admin Usuario? @relation(fields: [id_admin], references: [id], onDelete: SetNull)
+
+  @@index([criado_em(sort: Desc)])
+  @@index([id_carta, criado_em(sort: Desc)])
+  @@map("log_admin_carta")
+}
+
+model Carta {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome          String    @db.VarChar(150)
+  elemento      String    @db.VarChar(20)
+  raridade      String    @db.VarChar(50)
+  hp_base       Int       @default(0)
+  dano_base     Int       @default(0)
+  defesa_base   Int       @default(0)
+  passiva       Json?
+  foto          String?   @db.VarChar(500)
+  foto_perfil   String?   @db.VarChar(500)
+  moldura       String?   @db.VarChar(500)
+  config_visual Json?
+  ativo         Boolean?  @default(true)
+  criado_em     DateTime? @default(now()) @db.Timestamptz(0)
+  atualizado_em DateTime? @default(now()) @db.Timestamptz(0)
+  excluido_em   DateTime? @db.Timestamptz(0)
+  id_classe     String?   @db.Uuid
+
+  classe           ClasseCarta?      @relation(fields: [id_classe], references: [id], onDelete: SetNull)
+  banners          BannerCarta[]
+  gachaLogs        LogGacha[]
+  inventarios      Inventario[]
+  deckCartas       DeckCarta[]
+  habilidades      CartaHabilidade[]
+  partidasCartas   PartidaCarta[]
+  perfisComMoldura PerfilUsuario[]   @relation("CartaMolduraPerfil")
+
+  @@index([id_classe])
+  @@map("carta")
+}
+
+model RaridadeCarta {
+  codigo         String   @id @db.VarChar(50)
+  nome           String   @unique @db.VarChar(80)
+  valor_venda    Int      @default(0)
+  cor            String   @default("#a78bfa") @db.VarChar(7)
+  ordem          Int      @default(0)
+  criado_em      DateTime @default(now()) @db.Timestamptz(0)
+  atualizado_em  DateTime @default(now()) @db.Timestamptz(0)
+
+  @@map("raridade_carta")
+}
+
+model ClasseCarta {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome               String   @unique @db.VarChar(80)
+  descricao          String?  @db.VarChar(255)
+  prioridade_ataque  Int      @default(3)
+  modificador_hp     Int      @default(0)
+  modificador_ataque Int      @default(0)
+  modificador_defesa Int      @default(0)
+  ativo              Boolean  @default(true)
+  criado_em          DateTime @default(now()) @db.Timestamptz(0)
+  atualizado_em      DateTime @default(now()) @db.Timestamptz(0)
+
+  cartas Carta[]
+
+  @@index([ativo, prioridade_ataque])
+  @@map("classe_carta")
+}
+
+model Habilidade {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome            String    @unique @db.VarChar(100)
+  descricao       String?   @db.VarChar(500)
+  modo_execucao   String    @default("AUTOMATICA") @db.VarChar(20)
+  tipo_efeito     String    @db.VarChar(30)
+  gatilho         String    @db.VarChar(30)
+  alvo            String    @db.VarChar(30)
+  atributo        String?   @db.VarChar(20)
+  unidade         String    @db.VarChar(20)
+  valor_base      Int
+  forma_aplicacao String    @db.VarChar(30)
+  requisito_tipo  String    @default("NENHUM") @db.VarChar(30)
+  requisito_valor Int?
+  escala_tipo     String    @default("NENHUMA") @db.VarChar(20)
+  escala_valor    Int?
+  escala_limite   Int?
+  duracao_turnos  Int?
+  status          String    @default("RASCUNHO") @db.VarChar(20)
+  versao          Int       @default(1)
+  testada_em      DateTime? @db.Timestamptz(0)
+  criado_em       DateTime  @default(now()) @db.Timestamptz(0)
+  atualizado_em   DateTime  @default(now()) @db.Timestamptz(0)
+
+  cartas CartaHabilidade[]
+
+  @@index([status, tipo_efeito])
+  @@map("habilidade")
+}
+
+model CartaHabilidade {
+  id_carta      String   @db.Uuid
+  id_habilidade String   @db.Uuid
+  ordem         Int      @default(1)
+  criado_em     DateTime @default(now()) @db.Timestamptz(0)
+
+  carta      Carta      @relation(fields: [id_carta], references: [id], onDelete: Cascade)
+  habilidade Habilidade @relation(fields: [id_habilidade], references: [id], onDelete: Restrict)
+
+  @@id([id_carta, id_habilidade])
+  @@unique([id_carta, ordem])
+  @@index([id_habilidade])
+  @@map("carta_habilidade")
+}
+
+model Banner {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome          String    @db.VarChar(150)
+  custo_giro    Int       @default(100)
+  ativo         Boolean?  @default(true)
+  criado_em     DateTime? @default(now()) @db.Timestamptz(0)
+  atualizado_em DateTime? @default(now()) @db.Timestamptz(0)
+  inicio_em     DateTime? @db.Timestamptz(0)
+  fim_em        DateTime? @db.Timestamptz(0)
+  configuracao  Json?
+
+  cartas         BannerCarta[]
+  gachaLogs      LogGacha[]
+  usuarioColetas UsuarioBannerColeta[]
+  rotacoes       BannerRotacao[]
+
+  @@map("banner")
+}
+
+model BannerRotacao {
+  id                 Int      @id @default(1)
+  id_banner          String   @db.Uuid
+  proxima_rotacao_em DateTime @db.Timestamptz(0)
+  forcado_por_admin  Boolean  @default(false)
+  atualizado_em      DateTime @default(now()) @db.Timestamptz(0)
+
+  banner Banner @relation(fields: [id_banner], references: [id], onDelete: Restrict)
+
+  @@index([id_banner])
+  @@map("banner_rotacao")
+}
+
+model BannerCarta {
+  id_banner String  @db.Uuid
+  id_carta  String  @db.Uuid
+  taxa_drop Decimal @db.Decimal(5, 2)
+
+  banner Banner @relation(fields: [id_banner], references: [id], onDelete: Cascade)
+  carta  Carta  @relation(fields: [id_carta], references: [id], onDelete: Cascade)
+
+  @@id([id_banner, id_carta])
+  @@index([id_banner], map: "idx_banner_carta_banner")
+  @@map("banner_carta")
+}
+
+model LogGacha {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario      String    @db.Uuid
+  id_banner       String    @db.Uuid
+  id_carta_obtida String    @db.Uuid
+  rubys_gastos    Int
+  pity_contador   Int       @default(0)
+  timestamp_pull  DateTime? @default(now()) @db.Timestamptz(0)
+
+  usuario     Usuario @relation(fields: [id_usuario], references: [id])
+  banner      Banner  @relation(fields: [id_banner], references: [id])
+  cartaObtida Carta   @relation(fields: [id_carta_obtida], references: [id])
+
+  @@index([id_usuario], map: "idx_log_gacha_usuario")
+  @@index([id_banner], map: "idx_log_gacha_banner")
+  @@index([timestamp_pull(sort: Desc)], map: "idx_log_gacha_timestamp")
+  @@map("log_gacha")
+}
+
+model UsuarioBannerColeta {
+  id_usuario    String    @db.Uuid
+  id_banner     String    @db.Uuid
+  ultima_coleta DateTime? @db.Timestamptz(0)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  banner  Banner  @relation(fields: [id_banner], references: [id], onDelete: Cascade)
+
+  @@id([id_usuario, id_banner])
+  @@map("usuario_banner_coleta")
+}
+
+model Inventario {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario    String?   @db.Uuid
+  id_carta      String?   @db.Uuid
+  quantidade    Int?      @default(1)
+  criado_em     DateTime? @default(now()) @db.Timestamptz(0)
+  atualizado_em DateTime? @default(now()) @db.Timestamptz(0)
+
+  usuario Usuario? @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  carta   Carta?   @relation(fields: [id_carta], references: [id])
+
+  @@unique([id_usuario, id_carta], map: "uq_inventario_usuario_carta")
+  @@index([id_usuario], map: "idx_inventario_usuario")
+  @@map("inventario")
+}
+
+model Deck {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario    String?   @db.Uuid
+  nome          String    @default("Meu Deck") @db.VarChar(100)
+  ativo         Boolean?  @default(false)
+  criado_em     DateTime? @default(now()) @db.Timestamptz(0)
+  atualizado_em DateTime? @default(now()) @db.Timestamptz(0)
+  excluido_em   DateTime? @db.Timestamptz(0)
+
+  usuario    Usuario?     @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  cartas     DeckCarta[]
+  partidas   LogPartida[]
+  expedicoes Expedicao[]
+
+  @@map("deck")
+}
+
+model DeckCarta {
+  id_deck      String    @db.Uuid
+  id_carta     String    @db.Uuid
+  posicao_slot Int
+  criado_em    DateTime? @default(now()) @db.Timestamptz(0)
+
+  deck  Deck  @relation(fields: [id_deck], references: [id], onDelete: Cascade)
+  carta Carta @relation(fields: [id_carta], references: [id], onDelete: Cascade)
+
+  @@id([id_deck, id_carta])
+  @@unique([id_deck, posicao_slot], map: "uq_deck_posicao")
+  @@map("deck_carta")
+}
+
+model LogPartida {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario          String?   @db.Uuid
+  id_usuario_oponente String?   @db.Uuid
+  id_deck_usado       String?   @db.Uuid
+  id_expedicao        String?   @db.Uuid
+  etapa_expedicao     Int?
+  resultado           String    @db.VarChar(20)
+  turnos_jogados      Int       @default(0)
+  variacao_pontos     Int?      @default(0)
+  recompensa_rubys    Int       @default(0)
+  timestamp_inicio    DateTime? @default(now()) @db.Timestamptz(0)
+  timestamp_fim       DateTime? @db.Timestamptz(0)
+
+  usuario   Usuario?        @relation("PartidasUsuario", fields: [id_usuario], references: [id])
+  oponente  Usuario?        @relation("PartidasOponente", fields: [id_usuario_oponente], references: [id])
+  deck      Deck?           @relation(fields: [id_deck_usado], references: [id])
+  expedicao Expedicao?      @relation(fields: [id_expedicao], references: [id], onDelete: SetNull)
+  cartas    PartidaCarta[]
+  eventos   EventoPartida[]
+
+  @@index([id_usuario], map: "idx_log_partida_usuario")
+  @@index([id_usuario_oponente], map: "idx_log_partida_oponente")
+  @@index([timestamp_inicio(sort: Desc)], map: "idx_log_partida_timestamp")
+  @@index([id_expedicao, etapa_expedicao])
+  @@map("log_partida")
+}
+
+model Expedicao {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario           String    @db.Uuid
+  id_deck              String    @db.Uuid
+  seed                 Int
+  status               String    @default("EM_ANDAMENTO") @db.VarChar(20)
+  etapa_atual          Int       @default(0)
+  trilha               Json
+  escolhas             String[]  @default([])
+  escolha_atual        String?   @db.VarChar(80)
+  dialogo_boss         Json?
+  criado_em            DateTime  @default(now()) @db.Timestamptz(0)
+  atualizado_em        DateTime  @default(now()) @db.Timestamptz(0)
+  finalizado_em        DateTime? @db.Timestamptz(0)
+  id_produto_expedicao String?   @db.Uuid
+
+  usuario  Usuario           @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  deck     Deck              @relation(fields: [id_deck], references: [id], onDelete: Restrict)
+  partidas LogPartida[]
+  produto  ProdutoExpedicao? @relation(fields: [id_produto_expedicao], references: [id], onDelete: SetNull)
+
+  @@index([id_usuario, criado_em(sort: Desc)])
+  @@index([id_produto_expedicao])
+  @@map("expedicao")
+}
+
+model ProdutoExpedicao {
+  id                         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome                       String    @db.VarChar(100)
+  descricao                  String    @db.VarChar(300)
+  tema                       String    @default("ARCANO") @db.VarChar(40)
+  tipo                       String    @default("RECORRENTE") @db.VarChar(20)
+  ativo                      Boolean   @default(true)
+  peso                       Int       @default(100)
+  inicio_em                  DateTime? @db.Timestamptz(0)
+  fim_em                     DateTime? @db.Timestamptz(0)
+  recompensa_facil           Int       @default(25)
+  recompensa_media           Int       @default(25)
+  recompensa_dificil         Int       @default(25)
+  recompensa_chefe           Int       @default(100)
+  percentual_mantido_derrota Int       @default(70)
+  boss_nome                  String    @default("Guardião da Expedição") @db.VarChar(100)
+  boss_personalidade         String    @default("Orgulhoso, estratégico e provocador, mas respeita a coragem.") @db.VarChar(600)
+  boss_provocacao            String    @default("Você atravessou minha trilha. Agora prove que merece sair dela.") @db.VarChar(500)
+  boss_perguntas             String[]  @default(["Por que você merece atravessar meu domínio?", "O que faria se sua carta mais forte caísse agora?", "Qual sacrifício aceitaria para vencer esta batalha?", "O que distingue coragem de imprudência?"])
+  boss_cartas                String[]  @default([])
+  secoes                     Json      @default("[]")
+  criado_em                  DateTime  @default(now()) @db.Timestamptz(0)
+  atualizado_em              DateTime  @default(now()) @db.Timestamptz(0)
+
+  expedicoes Expedicao[]
+
+  @@index([ativo, inicio_em, fim_em])
+  @@map("produto_expedicao")
+}
+
+model TemaExpedicao {
+  nome      String   @id @db.VarChar(40)
+  criado_em DateTime @default(now()) @db.Timestamptz(0)
+
+  @@map("tema_expedicao")
+}
+
+model ConfiguracaoCampanha {
+  id                         Int      @id @default(1)
+  ativa                      Boolean  @default(true)
+  recompensa_facil           Int      @default(25)
+  recompensa_media           Int      @default(25)
+  recompensa_dificil         Int      @default(25)
+  recompensa_chefe           Int      @default(100)
+  percentual_mantido_derrota Int      @default(70)
+  boss_nome                  String   @default("Guardião da Expedição") @db.VarChar(100)
+  boss_personalidade         String   @default("Orgulhoso, estratégico e provocador, mas respeita a coragem.") @db.VarChar(600)
+  boss_provocacao            String   @default("Você atravessou minha trilha. Agora prove que merece sair dela.") @db.VarChar(500)
+  boss_perguntas             String[] @default(["Por que você merece atravessar meu domínio?", "O que faria se sua carta mais forte caísse agora?", "Qual sacrifício aceitaria para vencer esta batalha?", "O que distingue coragem de imprudência?"])
+  boss_cartas                String[] @default([])
+  atualizado_em              DateTime @default(now()) @db.Timestamptz(0)
+
+  @@map("configuracao_campanha")
+}
+
+model PartidaCarta {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_partida       String   @db.Uuid
+  id_carta         String   @db.Uuid
+  lado             String   @db.VarChar(10)
+  posicao          Int
+  nome_snapshot    String   @db.VarChar(150)
+  raridade         String   @db.VarChar(50)
+  elemento         String   @db.VarChar(20)
+  foto             String?  @db.VarChar(500)
+  moldura          String?  @db.VarChar(500)
+  config_visual    Json?
+  passiva          Json?
+  hp_base          Int
+  ataque_base      Int
+  defesa_base      Int
+  velocidade_base  Int
+  hp_atual         Int
+  ataque_atual     Int
+  defesa_atual     Int
+  velocidade_atual Int
+  derrotada        Boolean  @default(false)
+  atualizado_em    DateTime @default(now()) @db.Timestamptz(0)
+
+  partida LogPartida @relation(fields: [id_partida], references: [id], onDelete: Cascade)
+  carta   Carta      @relation(fields: [id_carta], references: [id], onDelete: Restrict)
+
+  @@unique([id_partida, lado, posicao])
+  @@index([id_partida, lado, derrotada])
+  @@map("partida_carta")
+}
+
+model EventoPartida {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_partida String   @db.Uuid
+  sequencia  Int
+  turno      Int
+  tipo       String   @db.VarChar(30)
+  origem     String?  @db.VarChar(10)
+  texto      String   @db.VarChar(500)
+  valor      Int?
+  criado_em  DateTime @default(now()) @db.Timestamptz(0)
+
+  partida LogPartida @relation(fields: [id_partida], references: [id], onDelete: Cascade)
+
+  @@unique([id_partida, sequencia])
+  @@index([id_partida, turno])
+  @@map("evento_partida")
+}
+
+model Noticia {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  titulo        String   @db.VarChar(180)
+  resumo        String   @db.VarChar(320)
+  conteudo      String
+  imagem        String?  @db.VarChar(500)
+  categoria     String   @default("NOVIDADE") @db.VarChar(30)
+  anexos        Json?
+  publicada     Boolean  @default(false)
+  criado_em     DateTime @default(now()) @db.Timestamptz(0)
+  atualizado_em DateTime @default(now()) @db.Timestamptz(0)
+
+  @@index([publicada, criado_em(sort: Desc)])
+  @@map("noticia")
+}

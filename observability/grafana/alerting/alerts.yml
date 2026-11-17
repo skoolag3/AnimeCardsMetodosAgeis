@@ -1,0 +1,48 @@
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: Caixa de alertas
+    receivers:
+      - uid: animecards-email
+        type: email
+        settings:
+          addresses: alertas@animecards.local
+policies:
+  - orgId: 1
+    receiver: Caixa de alertas
+    group_by: [grafana_folder, alertname]
+groups:
+  - orgId: 1
+    name: animecards-alertas
+    folder: AnimeCards
+    interval: 1m
+    rules:
+      - uid: animecards-backend-down
+        title: Backend indisponivel
+        condition: C
+        for: 2m
+        noDataState: Alerting
+        execErrState: Alerting
+        annotations:
+          summary: Prometheus nao coleta o backend ha pelo menos dois minutos.
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: up{job="animecards-backend"}
+              instant: true
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: {type: lt, params: [1]}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {type: last, params: []}
+                  type: query
+              refId: C

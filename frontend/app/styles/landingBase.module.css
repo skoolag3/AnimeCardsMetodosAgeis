@@ -1,0 +1,23 @@
+.pagina {
+  --corBg: #0a0a0f;
+  --corPainel: #10101a;
+  --corRoxo: #7c3aed;
+  --corRoxo2: #9333ea;
+  --corRoxoClaro: #a78bfa;
+  --corVerde: #bef264;
+  --corCiano: #67e8f9;
+  --corTexto: #fff;
+  --corMuted: #a8a8b8;
+  --corBorda: rgba(148, 163, 184, 0.18);
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--corBg);
+  color: var(--corTexto);
+}
+
+.pagina > section {
+  position: relative;
+  z-index: 1;
+}
+

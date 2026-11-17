@@ -1,0 +1,113 @@
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UploadedFiles,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { AdminGuard } from '../../../common/guards/admin.guard';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { validarConteudoImagem } from '../../../common/validation/imagem.validation';
+import { AdminCloudinaryService } from '../services/admin-cloudinary.service';
+
+type CartaAssetFiles = {
+  foto?: Express.Multer.File[];
+  fotoPerfil?: Express.Multer.File[];
+  moldura?: Express.Multer.File[];
+};
+
+const maxAssetSizeBytes = 5 * 1024 * 1024;
+
+function imageFileFilter(
+  _request: unknown,
+  file: Express.Multer.File,
+  callback: (error: Error | null, acceptFile: boolean) => void,
+) {
+  if (file.mimetype.startsWith('image/')) {
+    callback(null, true);
+    return;
+  }
+
+  callback(new BadRequestException('Envie apenas arquivos de imagem.'), false);
+}
+
+const cartaAssetInterceptor = FileFieldsInterceptor(
+  [
+    { name: 'foto', maxCount: 1 },
+    { name: 'fotoPerfil', maxCount: 1 },
+    { name: 'moldura', maxCount: 1 },
+  ],
+  {
+    storage: memoryStorage(),
+    limits: {
+      fileSize: maxAssetSizeBytes,
+      files: 3,
+    },
+    fileFilter: imageFileFilter,
+  },
+);
+
+@Controller('admin')
+@UseGuards(JwtAuthGuard, AdminGuard)
+export class AdminUploadsController {
+  constructor(private readonly cloudinaryService: AdminCloudinaryService) {}
+
+  @Post('uploads/cartas/assinatura')
+  assinarUploadCarta(@Body('tipo') tipo: string, @Body('fingerprint') fingerprint: string) {
+    if (!['foto', 'fotoPerfil', 'moldura'].includes(tipo)) {
+      throw new BadRequestException('Tipo de imagem inválido.');
+    }
+    if (typeof fingerprint !== 'string' || !/^[a-f0-9]{64}$/.test(fingerprint)) {
+      throw new BadRequestException('Identificador da imagem inválido.');
+    }
+    return this.cloudinaryService.assinarUploadCarta(tipo as 'foto' | 'fotoPerfil' | 'moldura', fingerprint);
+  }
+
+  @Post('uploads/cartas')
+  @UseInterceptors(cartaAssetInterceptor)
+  uploadCartaAssets(@UploadedFiles() files: CartaAssetFiles) {
+    files.foto?.forEach((arquivo) => validarConteudoImagem(arquivo));
+    files.fotoPerfil?.forEach((arquivo) =>
+      validarConteudoImagem(arquivo, ['image/jpeg', 'image/png', 'image/webp']),
+    );
+    files.moldura?.forEach((arquivo) => validarConteudoImagem(arquivo));
+    return this.cloudinaryService.uploadCartaAssets(files);
+  }
+
+  @Post('uploads/noticias')
+  @UseInterceptors(
+    FileInterceptor('imagem', {
+      storage: memoryStorage(),
+      limits: { fileSize: maxAssetSizeBytes },
+      fileFilter: imageFileFilter,
+    }),
+  )
+  uploadNoticiaImagem(@UploadedFile() imagem: Express.Multer.File) {
+    if (!imagem) throw new BadRequestException('Envie a imagem da notícia.');
+    validarConteudoImagem(imagem);
+    return this.cloudinaryService.uploadNoticiaImagem(imagem);
+  }
+
+  @Patch('cartas/:id/assets')
+  @UseInterceptors(cartaAssetInterceptor)
+  updateCartaAssets(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UploadedFiles() files: CartaAssetFiles,
+  ) {
+    files.foto?.forEach((arquivo) => validarConteudoImagem(arquivo));
+    files.fotoPerfil?.forEach((arquivo) =>
+      validarConteudoImagem(arquivo, ['image/jpeg', 'image/png', 'image/webp']),
+    );
+    files.moldura?.forEach((arquivo) => validarConteudoImagem(arquivo));
+    return this.cloudinaryService.updateCartaAssets(id, files);
+  }
+}

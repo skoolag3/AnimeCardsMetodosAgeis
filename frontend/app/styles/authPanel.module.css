@@ -1,0 +1,585 @@
+.fundoModal {
+  --corBg: #0a0a0f;
+  --corPainel: #10101a;
+  --corPainelElevado: #171726;
+  --corRoxo: #7c3aed;
+  --corRoxoClaro: #a78bfa;
+  --corCiano: #22d3ee;
+  --corTexto: #fff;
+  --corMuted: #a8a8b8;
+  --corBorda: rgba(167, 139, 250, 0.34);
+  --raio: 0.75rem;
+  --sombra: 0 2rem 5rem rgba(0, 0, 0, 0.72);
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: clamp(0.85rem, 3vw, 1.5rem);
+  background:
+    radial-gradient(
+      circle at 50% 44%,
+      rgba(2, 2, 7, 0.7) 0 18rem,
+      rgba(2, 5, 10, 0.48) 34rem,
+      rgba(2, 5, 10, 0.38) 100%
+    );
+  backdrop-filter: blur(0.22rem) brightness(0.78) saturate(0.9);
+  animation: aparecerFundo 180ms ease-out both;
+}
+
+.modal {
+  position: relative;
+  width: min(100%, 30rem);
+  max-height: min(92svh, 48rem);
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+    rgba(14, 14, 23, 0.96);
+  padding: clamp(1.35rem, 4vw, 2rem);
+  color: var(--corTexto);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    var(--sombra);
+  animation: subirModal 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  backdrop-filter: blur(1rem);
+  scrollbar-width: none;
+}
+
+.modal::-webkit-scrollbar { display: none; }
+
+.modal::before {
+  position: absolute;
+  top: 0;
+  left: 14%;
+  width: 72%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(190, 242, 100, 0.62), #a78bfa, transparent);
+  content: "";
+}
+
+.modalCadastro { width: min(100%, 35rem); padding-top: 1.25rem; padding-bottom: 1.25rem; }
+
+.modalCadastro .seloModal { margin-bottom: 0.55rem; }
+
+.modalCadastro .form { gap: 0.72rem; margin-top: 1rem; }
+
+.modalCadastro .rodape { margin-top: 0.8rem; }
+
+.modal,
+.modal * { box-sizing: border-box; }
+
+.btnFechar {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--corMuted);
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.btnFechar:hover { background: rgba(255, 255, 255, 0.08); color: var(--corTexto); transform: translateY(-1px); }
+
+.titulo {
+  margin: 0;
+  color: var(--corTexto);
+  font-size: clamp(1.65rem, 5vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.subtitulo {
+  margin: 0.6rem auto 0;
+  max-width: 22rem;
+  color: var(--corMuted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.form { display: grid; gap: 0.9rem; margin-top: 1.35rem; }
+
+.btnFechar svg,
+.campoSenha button svg { width: 1rem; height: 1rem; flex: 0 0 auto; }
+
+.linhaCampos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+
+.campo { display: grid; gap: 0.5rem; }
+
+.rotulo {
+  color: #dedaf0;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.entrada {
+  width: 100%;
+  min-height: 3.1rem;
+  border: 1px solid rgba(167, 139, 250, 0.24);
+  border-radius: 0.7rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    rgba(6, 6, 11, 0.9);
+  color: var(--corTexto);
+  font: inherit;
+  outline: none;
+  padding: 0.8rem 0.9rem;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.entrada:focus { border-color: rgba(190, 242, 100, 0.48); box-shadow: none; background: linear-gradient(180deg, rgba(255, 255, 255, 0.052), transparent), #0e0e17; }
+
+.campoIcone,
+.campoSenha { position: relative; display: block; }
+
+.entradaComIcone { padding-left: 2.65rem; }
+
+.iconeEntrada {
+  position: absolute;
+  top: 50%;
+  left: 0.9rem;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  color: #8f86aa;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: color 160ms ease;
+}
+
+.campoIcone:focus-within .iconeEntrada,
+.campoSenha:focus-within .iconeEntrada { color: var(--corRoxoClaro); }
+
+.campoSenha { display: block; }
+
+.campoSenha .entrada { padding-right: 3.1rem; }
+
+.campoSenha button {
+  position: absolute;
+  top: 50%;
+  right: 0.55rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--corRoxoClaro);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.campoSenha button:hover { border-color: rgba(167, 139, 250, 0.2); background: rgba(255, 255, 255, 0.08); color: var(--corTexto); }
+
+.btnTexto,
+.btnVoltar {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--corRoxoClaro);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  padding: 0;
+}
+
+.btnTexto:hover,
+.btnVoltar:hover,
+.rodape button:hover,
+.voltar:hover { color: #d9f99d; }
+
+.btnEnviar {
+  display: inline-flex;
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 3.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.7rem;
+  background: linear-gradient(135deg, #bef264, #a78bfa 44%, #6d28d9);
+  color: var(--corTexto);
+  cursor: pointer;
+  font-weight: 950;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transition:
+    filter 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.btnEnviar:not(:disabled):hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32); }
+
+.btnEnviar:disabled { cursor: not-allowed; opacity: 0.62; }
+
+.btnEnviar svg {
+  position: relative;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.btnEnviar > :not(svg) { position: relative; z-index: 1; }
+
+.separador {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.8rem;
+  align-items: center;
+  margin: 1.25rem 0;
+  color: var(--corMuted);
+}
+
+.separador span { height: 1px; background: rgba(167, 139, 250, 0.2); }
+
+.btnGoogle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 3rem;
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--corTexto);
+  color-scheme: dark;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 800;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.btnGoogle:hover { border-color: rgba(34, 211, 238, 0.55); background: rgba(34, 211, 238, 0.08); transform: translateY(-1px); }
+
+.rotuloCheck {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  color: #d4d4df;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  padding: 0.3rem 0;
+}
+
+.rotuloCheck > span > button:focus-visible { outline: 2px solid #bef264; outline-offset: 2px; }
+
+.rotuloCheck label { cursor: pointer; }
+
+.rotuloCheck > span > button {
+  border: 0;
+  background: none;
+  color: #c4b5fd;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+  text-decoration: underline;
+  text-decoration-color: rgba(196, 181, 253, 0.45);
+  text-underline-offset: 0.18rem;
+}
+
+.entrada:-webkit-autofill,
+.entrada:-webkit-autofill:hover,
+.entrada:-webkit-autofill:focus,
+.entrada:-webkit-autofill:active {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  outline: none !important;
+  border: 1px solid rgba(167, 139, 250, 0.24) !important;
+  -webkit-text-fill-color: var(--corTexto) !important;
+  caret-color: var(--corTexto) !important;
+  box-shadow: 0 0 0 1000px #0b0b13 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #0b0b13 inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
+.entrada:-webkit-autofill:focus { border-color: rgba(190, 242, 100, 0.48) !important; outline: none !important; }
+
+.entrada:-moz-autofill,
+.entrada:autofill {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  outline: none !important;
+  border: 1px solid rgba(167, 139, 250, 0.24) !important;
+  background: #0b0b13 !important;
+  color: var(--corTexto) !important;
+}
+
+.entrada:autofill:focus { border-color: rgba(190, 242, 100, 0.48) !important; outline: none !important; }
+
+.rodape { margin: 1.15rem 0 0; color: #d4d4df; font-size: 0.88rem; text-align: center; }
+
+.rodape button {
+  border: 0;
+  background: transparent;
+  color: var(--corRoxoClaro);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  padding: 0;
+}
+
+.alerta {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  margin: 0;
+  border: 1px solid;
+  border-radius: 0.58rem;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+.alerta svg { flex: 0 0 auto; width: 1rem; height: 1rem; margin-top: 0.08rem; }
+
+.erro { border-color: rgba(248, 113, 113, 0.46); background: rgba(127, 29, 29, 0.34); color: #fecaca; }
+
+.sucesso { border-color: rgba(52, 211, 153, 0.46); background: rgba(6, 78, 59, 0.34); color: #bbf7d0; }
+
+.btnEnviar::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 25%, rgba(255, 255, 255, 0.28), transparent 58%);
+  content: "";
+  transform: translateX(-120%);
+  transition: transform 420ms ease;
+}
+
+.btnEnviar:not(:disabled):hover::after { transform: translateX(120%); }
+
+.entrada::placeholder { color: #777483; opacity: 1; }
+
+.cabecalhoModal { text-align: center; }
+
+.seloModal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin-bottom: 0.85rem;
+  border: 1px solid rgba(190, 242, 100, 0.2);
+  border-radius: 999px;
+  background: rgba(190, 242, 100, 0.06);
+  color: #d9f99d;
+  padding: 0.36rem 0.62rem;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.googleMark {
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #fff;
+  color: #4285f4;
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
+.seloModal svg { width: 0.65rem; }
+
+.aviso { border-color: rgba(251, 191, 36, 0.46); background: rgba(120, 53, 15, 0.28); color: #fde68a; }
+
+.iconeStatus {
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  place-items: center;
+  border: 1px solid rgba(167, 243, 208, 0.22);
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.16);
+  color: #a7f3d0;
+  box-shadow: none;
+}
+
+.iconeStatus svg { width: 1.35rem; height: 1.35rem; }
+
+.btnVoltar { margin-top: 1.2rem; }
+
+.tela { min-height: calc(100svh - 4.5rem); background: #0a0a0f; color: #fff; }
+
+.gradeTela {
+  display: grid;
+  min-height: inherit;
+  place-items: center;
+  width: min(100% - 2rem, 36rem);
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.textoTela { display: none; }
+
+.painelTela {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.9rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018)),
+    #10101a;
+  padding: clamp(1.35rem, 4vw, 2rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1.5rem 3.5rem rgba(0, 0, 0, 0.38);
+}
+
+.tituloTela { margin: 0; font-size: clamp(2rem, 6vw, 3rem); text-transform: uppercase; }
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+  color: #a78bfa;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.voltar svg { width: 0.9rem; height: 0.9rem; }
+
+@keyframes aparecerFundo {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes subirModal {
+  from { opacity: 0; transform: translateY(0.7rem) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 42rem) {
+  .fundoModal { place-items: center; padding: 0.75rem; background: rgba(2, 5, 10, 0.58); backdrop-filter: blur(0.18rem) brightness(0.76) saturate(0.9); }
+
+  .modal {
+    width: min(100%, 24rem);
+    max-height: calc(100svh - 1.5rem);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.9rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+      rgba(16, 16, 26, 0.96);
+    padding: 1.15rem;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 1.2rem 3rem rgba(0, 0, 0, 0.62);
+    backdrop-filter: blur(0.8rem);
+  }
+
+  .modalCadastro { width: min(100%, 32rem); padding-top: 1rem; padding-bottom: 1rem; }
+
+  .btnFechar {
+    top: 0.45rem;
+    right: 0.45rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    z-index: 2;
+    touch-action: manipulation;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .titulo {
+    padding: 0 2.7rem;
+    font-size: 1.55rem;
+    line-height: 1.05;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .subtitulo {
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 0.9rem;
+    line-height: 1.48;
+    text-align: center;
+  }
+
+  .form { gap: 0.78rem; margin-top: 1.15rem; }
+
+  .campo { gap: 0.42rem; }
+
+  .rotulo { font-size: 0.68rem; }
+
+  .entrada,
+  .btnEnviar,
+  .btnGoogle { min-height: 2.95rem; }
+
+  .entrada { padding-top: 0.68rem; padding-bottom: 0.68rem; font-size: 0.95rem; }
+
+  .entradaComIcone { padding-left: 2.45rem; }
+
+  .iconeEntrada { left: 0.82rem; }
+
+  .campoSenha .entrada { padding-right: 2.9rem; }
+
+  .separador { margin: 1rem 0; }
+
+  .rotuloCheck,
+  .rodape,
+  .alerta,
+  .btnTexto,
+  .btnVoltar { font-size: 0.86rem; }
+
+  .alerta { padding: 0.65rem 0.7rem; }
+
+  .iconeStatus { width: 3.2rem; height: 3.2rem; margin: 0 auto 0.8rem; }
+}
+
+@media (max-width: 30rem) {
+  .linhaCampos { grid-template-columns: 1fr; }
+}
+
+@media (max-height: 42rem) and (min-width: 42.01rem) {
+  .fundoModal { place-items: start center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fundoModal,
+  .modal { animation: none; }
+
+  .btnFechar,
+  .entrada,
+  .iconeEntrada,
+  .campoSenha button,
+  .btnEnviar,
+  .btnGoogle { transition: none; }
+}

@@ -1,0 +1,146 @@
+.carta {
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+  perspective: 1000px;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: visible;
+}
+
+.cartaInterativa {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cartaInterativa:focus-visible {
+  border-radius: 0.8rem;
+  outline: 0.16rem solid #a3e635;
+  outline-offset: 0.28rem;
+}
+
+.miolo,
+.frente,
+.verso {
+  position: absolute;
+  inset: 0;
+}
+
+.miolo {
+  transition: transform 140ms ease;
+}
+
+/* Teste antigo de pressão mantido como referência; o efeito novo usa hover. */
+/* .cartaInterativa:active .miolo {
+  transform: scale(0.985);
+} */
+
+@media (hover: hover) and (pointer: fine) {
+  .carta:hover .miolo {
+    transform: rotate3d(1, 1, 0, 3deg) translateY(-0.12rem);
+  }
+
+}
+
+.frente,
+.verso {
+  overflow: visible;
+  transition: opacity 140ms ease;
+}
+
+.frente {
+  z-index: 2;
+  visibility: visible;
+  transition: visibility 0s linear;
+}
+
+.verso {
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 140ms ease,
+    visibility 0s linear 140ms;
+}
+
+.virada .frente {
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0s, 140ms;
+}
+
+.virada .verso {
+  z-index: 3;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .miolo {
+    transition: none;
+  }
+}
+
+.canvasArte {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, #090c14, #02040a 72%);
+}
+
+.arte,
+.moldura {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.arte {
+  z-index: 1;
+  object-fit: cover;
+  object-position: center;
+  transform: translate(var(--arteX, 0), var(--arteY, 0))
+    rotate(var(--arteRotacao, 0deg)) scale(var(--arteEscala, 1));
+  transform-origin: center;
+}
+
+.conteudo {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  pointer-events: none;
+}
+
+.camadaMoldura {
+  position: absolute;
+  top: calc(-1 * var(--molduraTopo, 0%));
+  right: calc(-1 * var(--molduraDireita, 0%));
+  bottom: calc(-1 * var(--molduraBase, 0%));
+  left: calc(-1 * var(--molduraEsquerda, 0%));
+  z-index: 5;
+  pointer-events: none;
+  transform: translate(var(--molduraX, 0), var(--molduraY, 0))
+    rotate(var(--molduraRotacao, 0deg))
+    scale(var(--molduraEscalaX, 1), var(--molduraEscalaY, 1));
+  transform-origin: center;
+}
+
+.moldura {
+  object-fit: fill;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  color: #64748b;
+}

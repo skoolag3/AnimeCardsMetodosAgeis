@@ -1,0 +1,421 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.55rem;
+}
+.grid > .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.7rem;
+  min-height: 12.8rem;
+  padding: 0.8rem 0.9rem;
+}
+.card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+.card header h2 {
+  margin: 0.12rem 0 0;
+  color: #f8fafc;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+.card header small {
+  color: #6f7a8f;
+  font-size: 0.52rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.card header > strong {
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.14);
+  color: #c4b5fd;
+  padding: 0.26rem 0.55rem;
+  font-size: 0.56rem;
+  white-space: nowrap;
+}
+.card header > a,
+.card header > button,
+.atalhos a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  border: 0;
+  background: transparent;
+  color: #a995dc;
+  font: inherit;
+  font-size: 0.59rem;
+  font-weight: 780;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 0;
+}
+.card header > a:hover,
+.card header > button:hover,
+.atalhos a:hover {
+  color: #c4b5fd;
+}
+.card header > a svg,
+.card header > button svg,
+.atalhos a svg {
+  width: 0.72rem;
+}
+
+/* Gráfico Donut (Rosca) */
+.donutWrap {
+  display: grid;
+  grid-template-columns: 6.2rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem;
+  margin: auto 0;
+}
+.donutFigura {
+  position: relative;
+  width: 6.2rem;
+  height: 6.2rem;
+}
+.donutFigura svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.donutCentro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.donutCentro strong {
+  color: #f8fafc;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.donutCentro small {
+  margin-top: 0.12rem;
+  color: #7c879c;
+  font-size: 0.48rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.donutLegenda {
+  display: grid;
+  gap: 0.34rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.donutLegenda li {
+  display: grid;
+  grid-template-columns: 0.48rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.58rem;
+}
+.donutLegenda li i {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+}
+.donutLegenda li span {
+  overflow: hidden;
+  color: #cbd5e1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.donutLegenda li strong {
+  color: #f8fafc;
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+.donutLegenda li small {
+  min-width: 1.9rem;
+  color: #68748a;
+  font-size: 0.52rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Gráfico de Colunas Verticais */
+.graficoColunas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.6rem;
+  height: 7.8rem;
+  padding-top: 0.35rem;
+}
+.colunaItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.32rem;
+  height: 100%;
+}
+.colunaValor {
+  color: #e2e8f0;
+  font-size: 0.64rem;
+  font-variant-numeric: tabular-nums;
+}
+.colunaTrilha {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 2.3rem;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 0.48rem;
+  background: rgba(15, 23, 42, 0.78);
+  padding: 0.14rem;
+}
+.colunaTrilha i {
+  display: block;
+  width: 100%;
+  border-radius: 0.36rem;
+  transition: height 260ms ease;
+}
+.colunaItem small {
+  color: #7c879c;
+  font-size: 0.52rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Gráfico de Barras Horizontais */
+.graficoBarras {
+  display: grid;
+  gap: 0.52rem;
+  margin: auto 0;
+}
+.barraLinha {
+  display: grid;
+  gap: 0.22rem;
+}
+.barraCabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.58rem;
+}
+.barraCabecalho span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.35rem;
+  overflow: hidden;
+  color: #cbd5e1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pontoCor {
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+.barraCabecalho strong {
+  color: #f8fafc;
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.barraCabecalho strong[data-cor="verde"] {
+  color: #bef264;
+}
+.barraCabecalho strong[data-cor="roxo"] {
+  color: #c4b5fd;
+}
+.barraFundo {
+  height: 0.44rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #161f33;
+}
+.barraFundo i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 240ms ease;
+}
+
+/* Mini Auditoria rodapé do 6º card */
+.miniAuditoria {
+  display: grid;
+  gap: 0.25rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 0.45rem;
+}
+.miniAuditoria p {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+.miniAuditoria i {
+  width: 0.34rem;
+  height: 0.34rem;
+  border-radius: 50%;
+  background: #a3e635;
+}
+.miniAuditoria i[data-tipo="usuario"] {
+  background: #a78bfa;
+}
+.miniAuditoria strong {
+  overflow: hidden;
+  color: #cbd5e1;
+  font-size: 0.56rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.miniAuditoria time {
+  color: #68748a;
+  font-size: 0.5rem;
+  white-space: nowrap;
+}
+
+.estadoVazio {
+  display: grid;
+  min-height: 4rem;
+  place-items: center;
+  color: #64748b;
+  font-size: 0.58rem;
+}
+
+.atalhos {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 0.72rem;
+  background: rgba(8, 13, 27, 0.62);
+  padding: 0.35rem 0.45rem;
+}
+.atalhos > span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: auto;
+  padding: 0 0.35rem;
+  color: #79849a;
+  font-size: 0.56rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.atalhos > span svg {
+  width: 0.8rem;
+  color: #a78bfa;
+}
+.atalhos a {
+  min-height: 1.95rem;
+  border-radius: 0.48rem;
+  padding: 0 0.55rem;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+.atalhos a:hover {
+  background: rgba(124, 58, 237, 0.12);
+  color: #ddd6fe;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    margin-top: 0.45rem;
+  }
+  .grid > .card {
+    min-height: 0;
+    gap: 0.6rem;
+    padding: 0.7rem 0.75rem;
+  }
+  .card header h2 {
+    font-size: 0.8rem;
+  }
+  .donutWrap {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 0.7rem;
+  }
+  .donutFigura {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+  .donutCentro strong {
+    font-size: 0.84rem;
+  }
+  .donutLegenda {
+    gap: 0.28rem;
+  }
+  .donutLegenda li {
+    font-size: 0.56rem;
+  }
+  .graficoColunas {
+    height: 6.4rem;
+    gap: 0.45rem;
+  }
+  .colunaTrilha {
+    max-width: 2rem;
+  }
+  .atalhos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+    padding: 0.45rem;
+  }
+  .atalhos > span {
+    grid-column: 1 / -1;
+    margin-right: 0;
+    padding: 0 0.15rem 0.1rem;
+  }
+  .atalhos a {
+    min-height: 2.25rem;
+    justify-content: space-between;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    background: rgba(15, 23, 42, 0.45);
+    padding: 0 0.6rem;
+  }
+}
+@media (max-width: 390px) {
+  .donutWrap {
+    grid-template-columns: 4.9rem minmax(0, 1fr);
+    gap: 0.55rem;
+  }
+  .donutFigura {
+    width: 4.9rem;
+    height: 4.9rem;
+  }
+  .donutLegenda li {
+    grid-template-columns: 0.42rem minmax(0, 1fr) auto;
+  }
+  .donutLegenda li small {
+    display: none;
+  }
+  .graficoColunas {
+    height: 5.8rem;
+    gap: 0.35rem;
+  }
+  .colunaItem small {
+    font-size: 0.48rem;
+  }
+}

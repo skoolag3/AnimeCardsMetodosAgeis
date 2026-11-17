@@ -1,0 +1,377 @@
+.page {
+  width: min(100%, 78rem);
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.header {
+  border-bottom: 1px solid var(--member-border);
+  padding: 0.5rem 0 1rem;
+}
+
+.header > span,
+.notaStripe {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.header > span {
+  color: #bef264;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.header svg,
+.notaStripe svg {
+  width: 0.85rem;
+}
+
+.header h1 {
+  margin: 0.45rem 0 0.2rem;
+  font-size: clamp(1.75rem, 3vw, 2.6rem);
+  letter-spacing: -0.045em;
+}
+
+.header p {
+  margin: 0;
+  color: #8994a8;
+  font-size: 0.72rem;
+}
+
+.notaStripe {
+  margin-top: 0.55rem;
+  color: #737f93;
+  font-size: 0.58rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.card {
+  display: flex;
+  min-width: 0;
+  min-height: 21rem;
+  flex-direction: column;
+  border: 1px solid var(--member-border);
+  border-radius: 1rem;
+  background: linear-gradient(
+    160deg,
+    rgba(40, 35, 62, 0.85),
+    rgba(13, 16, 26, 0.96) 58%
+  );
+  padding: 1rem;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.card:hover {
+  border-color: rgba(167, 139, 250, 0.45);
+  box-shadow: 0 0.8rem 1.8rem rgba(124, 58, 237, 0.16);
+  transform: translateY(-0.2rem);
+}
+
+.destaque {
+  border-color: rgba(190, 242, 100, 0.72);
+  background: linear-gradient(155deg, rgba(71, 91, 39, 0.27), #10151d 48%);
+  box-shadow: 0 0 0 1px rgba(190, 242, 100, 0.1);
+}
+
+.cardTopo {
+  display: flex;
+  min-height: 2.35rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.icone {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 0.7rem;
+  color: #c4b5fd;
+  background: rgba(124, 58, 237, 0.16);
+}
+
+.icone svg {
+  width: 1.1rem;
+}
+
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  border: 1px solid rgba(190, 242, 100, 0.25);
+  border-radius: 999px;
+  color: #d9f99d;
+  background: rgba(101, 132, 45, 0.13);
+  padding: 0.25rem 0.4rem;
+  font-size: 0.48rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.selo svg {
+  width: 0.62rem;
+}
+
+.card h2 {
+  margin: 1rem 0 0.35rem;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.descricao {
+  min-height: 2.7rem;
+  margin: 0;
+  color: #828ca0;
+  font-size: 0.61rem;
+  line-height: 1.5;
+}
+
+.quantidade {
+  margin-top: 1rem;
+  color: #fff;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.quantidade em {
+  color: #c4b5fd;
+  font-size: 0.62rem;
+  font-style: normal;
+}
+
+.preco {
+  display: grid;
+  gap: 0.12rem;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.preco strong {
+  color: #d9f99d;
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.preco small {
+  color: #9aa5b7;
+  font-size: 0.66rem;
+}
+
+.beneficios {
+  display: grid;
+  gap: 0.45rem;
+  margin: 1.1rem 0 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--member-border);
+  list-style: none;
+  color: #adb8c9;
+  font-size: 0.66rem;
+}
+
+.beneficios li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.beneficios svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: 0 0 auto;
+  color: #bef264;
+}
+
+.card button {
+  min-height: 2.65rem;
+  margin-top: 0.85rem;
+  border: 1px solid rgba(190, 242, 100, 0.3);
+  border-radius: 0.55rem;
+  color: #0b0d14;
+  background: linear-gradient(135deg, #bef264, #8b5cf6);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.64rem;
+  font-weight: 900;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.card button:not(:disabled):hover {
+  filter: brightness(1.12);
+}
+
+.card button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.card button:focus-visible {
+  outline: 2px solid #bef264;
+  outline-offset: 3px;
+}
+
+.card button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.error,
+.empty,
+.aviso {
+  margin-top: 1rem;
+  color: #fca5a5;
+  font-size: 0.72rem;
+}
+
+.empty {
+  color: #8994a8;
+}
+
+.aviso {
+  border: 1px solid rgba(190, 242, 100, 0.28);
+  border-radius: 0.65rem;
+  background: rgba(190, 242, 100, 0.07);
+  padding: 0.7rem 0.85rem;
+  color: #d9f99d;
+}
+
+@media (max-width: 1050px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 0.55rem 0.75rem 2.5rem;
+  }
+
+  .header {
+    padding: 0.35rem 0 0.9rem;
+  }
+
+  .header h1 {
+    max-width: 18rem;
+    font-size: clamp(1.55rem, 7vw, 2rem);
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .header p {
+    max-width: 22rem;
+    line-height: 1.45;
+  }
+
+  .notaStripe {
+    align-items: flex-start;
+    line-height: 1.35;
+  }
+
+  .notaStripe svg {
+    height: 0.85rem;
+    flex: 0 0 0.85rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+  }
+
+  .card,
+  .descricao {
+    min-height: 0;
+  }
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 0.5rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .cardTopo {
+    grid-column: 1 / -1;
+    min-height: 1.8rem;
+    align-items: center;
+  }
+
+  .icone {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 0.5rem;
+  }
+
+  .icone svg {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .card h2 {
+    grid-column: 1;
+    align-self: center;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .descricao {
+    grid-column: 1 / -1;
+    font-size: 0.68rem;
+  }
+
+  .quantidade {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+
+  .beneficios {
+    display: none;
+  }
+
+  .preco {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    margin-top: 0.15rem;
+    padding-top: 0;
+  }
+
+  .preco strong {
+    font-size: 1.05rem;
+  }
+
+  .card button {
+    grid-column: 1 / -1;
+    min-height: 2.75rem;
+    margin-top: 0.25rem;
+    font-size: 0.72rem;
+  }
+
+  .selo {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card button {
+    transition: none;
+  }
+}

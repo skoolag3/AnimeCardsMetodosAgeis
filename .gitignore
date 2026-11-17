@@ -1,0 +1,40 @@
+# Arquivos de editores e IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar pastas de dependências caso você rode algo na raiz no futuro
+node_modules/
+
+# Ignorar variáveis de ambiente (MUITO IMPORTANTE)
+.env
+.env.local
+.env.*.local
+
+# Anotações privadas de desenvolvimento (não versionar)
+NOTAS_PRIVADAS_DESENVOLVIMENTO.md
+
+# Logs locais usados para manter os servidores de desenvolvimento ativos
+.codex-runtime/
+.codex-temp/
+
+# Anexos e artefatos temporários de trabalho
+.codex-remote-attachments/
+.local/
+.opencode/
+.agents/
+documentacao/
+scripts/
+backend-live*.log
+backend-server*.log
+frontend-live*.log
+frontend-server*.log
+

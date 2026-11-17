@@ -1,0 +1,420 @@
+"use client";
+
+import { getToken } from "./auth";
+import type { ConfigVisualCarta } from "../components/cartaMontada";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+
+export type CartaColecao = {
+  id: string;
+  nome: string;
+  raridade: string;
+  elemento: "natureza" | "agua" | "fogo" | "sombra" | "luz";
+  classe: string;
+  prioridadeAtaque: number;
+  custo: number;
+  hpBase: number;
+  danoBase: number;
+  defesaBase: number;
+  habilidades?: { id: string; nome: string; descricao: string | null }[];
+  passiva: Record<string, unknown>;
+  foto: string | null;
+  moldura: string | null;
+  configVisual: ConfigVisualCarta | null;
+  quantidade: number;
+  obtida: boolean;
+  obtidaEm: string | null;
+};
+
+export type ColecaoResponse = {
+  itens: CartaColecao[];
+  resumo: {
+    totalCartas: number;
+    cartasObtidas: number;
+    percentual: number;
+  };
+  jogador: {
+    nome: string;
+    nivel: number;
+    rubys: number;
+    avatarUrl: string | null;
+  };
+};
+
+export type CartaDeck = {
+  id: string;
+  nome: string;
+  raridade: string;
+  elemento: "natureza" | "agua" | "fogo" | "sombra" | "luz";
+  classe: string;
+  foto: string | null;
+  moldura: string | null;
+  configVisual: ConfigVisualCarta | null;
+  hpBase: number;
+  danoBase: number;
+  defesaBase: number;
+  posicao: number;
+};
+
+export type Deck = {
+  id: string;
+  nome: string;
+  ativo: boolean;
+  completo: boolean;
+  criadoEm: string;
+  atualizadoEm: string;
+  cartas: CartaDeck[];
+};
+
+type DeckResponse = { message: string; deck: Deck };
+
+async function jogoRequest<T>(path: string, options: RequestInit = {}) {
+  const token = getToken();
+  if (!token) throw new Error("Sessao expirada. Entre novamente.");
+
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  });
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const details = data?.details
+      ?.flatMap((item: { messages?: string[] }) => item.messages ?? [])
+      .filter(Boolean);
+    throw new Error(
+      details?.join(" ") ||
+        (Array.isArray(data?.message)
+          ? data.message.join(" ")
+          : data?.message) ||
+        "Não foi possível concluir a solicitação.",
+    );
+  }
+
+  return data as T;
+}
+
+export type RaridadeJogo = { codigo: string; nome: string; valor_venda: number; cor: string; ordem: number };
+
+export function listarRaridadesJogo() {
+  return jogoRequest<RaridadeJogo[]>("/raridades");
+}
+
+export function buscarColecao(posse?: "todas" | "obtidas" | "nao-obtidas") {
+  const parametros = posse ? `?posse=${posse}` : "";
+  return jogoRequest<ColecaoResponse>(`/colecao${parametros}`);
+}
+
+export function listarDecks() {
+  return jogoRequest<Deck[]>("/decks");
+}
+
+export function criarDeck(nome: string, cartas: string[], ativar = false) {
+  return jogoRequest<DeckResponse>("/decks", {
+    method: "POST",
+    body: JSON.stringify({ nome, cartas, ativar }),
+  });
+}
+
+export function atualizarDeck(
+  id: string,
+  dados: { nome?: string; cartas?: string[]; ativar?: boolean },
+) {
+  return jogoRequest<DeckResponse>(`/decks/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(dados),
+  });
+}
+
+export function ativarDeck(id: string) {
+  return jogoRequest<{ message: string }>(`/decks/${id}/ativar`, {
+    method: "POST",
+  });
+}
+
+export function excluirDeck(id: string) {
+  return jogoRequest<{ message: string }>(`/decks/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export type CartaPartida = {
+  id: string;
+  nome: string;
+  raridade: string;
+  elemento: string;
+  foto: string | null;
+  moldura: string | null;
+  configVisual: ConfigVisualCarta | null;
+  passiva: Record<string, unknown>;
+  hp: number;
+  hpAtual: number;
+  ataqueBase: number;
+  defesaBase: number;
+  ataque: number;
+  defesa: number;
+  prioridadeAtaque: number;
+  derrotada: boolean;
+  posicao: number;
+};
+
+export type EstadoPartida = {
+  id: string;
+  status: "EM_ANDAMENTO" | "FINALIZADA";
+  resultado: "VITORIA" | "DERROTA" | "EMPATE" | null;
+  turno: number;
+  vez: "JOGADOR" | null;
+  deck: { id: string; nome: string } | null;
+  expedicao: { id: string; etapa: number } | null;
+  recompensas: { pontos: number; rubys: number };
+  jogador: { ativa: number; cartas: CartaPartida[] };
+  bot: { ativa: number; cartas: CartaPartida[] };
+  eventos: {
+    id: string;
+    sequencia: number;
+    turno: number;
+    tipo: string;
+    origem: "JOGADOR" | "BOT" | null;
+    texto: string;
+    valor: number | null;
+    criadoEm: string;
+  }[];
+};
+
+export type AcaoTurno = "ATACAR" | "DEFENDER";
+
+export function buscarPartidaAtual() {
+  return jogoRequest<EstadoPartida | null>("/partidas/atual");
+}
+
+export type HistoricoPartida = {
+  id: string;
+  resultado: "VITORIA" | "DERROTA" | "EMPATE";
+  turnos_jogados: number;
+  variacao_pontos: number | null;
+  recompensa_rubys: number;
+  timestamp_inicio: string | null;
+  timestamp_fim: string | null;
+  deck: { nome: string } | null;
+};
+
+export function buscarHistoricoPartidas() {
+  return jogoRequest<HistoricoPartida[]>("/partidas");
+}
+
+export type JogadorRanking = {
+  posicao: number;
+  id: string;
+  nome: string;
+  nivel: number;
+  pontos: number;
+  partidas: number;
+  cartasColecionadas: number;
+  avatarUrl: string | null;
+  molduraClasse: string;
+  molduraUrl: string | null;
+  molduraConfig: ConfigVisualCarta | null;
+};
+
+export function buscarRanking() {
+  return jogoRequest<{ jogadores: JogadorRanking[] }>("/ranking");
+}
+
+export function iniciarPartida(idDeck: string) {
+  return jogoRequest<EstadoPartida>("/partidas", {
+    method: "POST",
+    body: JSON.stringify({ idDeck }),
+  });
+}
+
+export function executarTurno(idPartida: string, acao: AcaoTurno) {
+  return jogoRequest<EstadoPartida>(`/partidas/${idPartida}/turnos`, {
+    method: "POST",
+    body: JSON.stringify({ acao }),
+  });
+}
+
+export type OpcaoExpedicao = {
+  id: string;
+  titulo: string;
+  descricao: string;
+  dificuldade: "FACIL" | "MEDIA" | "DIFICIL" | "CHEFE";
+  risco: string;
+  recompensa: number;
+};
+
+export type EstadoExpedicao = {
+  id: string;
+  status: "EM_ANDAMENTO" | "CONCLUIDA" | "FALHOU" | "ABANDONADA";
+  seed: number;
+  etapaAtual: number;
+  totalEtapas: number;
+  deck: { id: string; nome: string };
+  produto: {
+    id: string;
+    nome: string;
+    descricao: string;
+    tema: string;
+    tipo: "RECORRENTE" | "EVENTO";
+  } | null;
+  escolhas: string[];
+  etapas: Array<{
+    indice: number;
+    status: "CONCLUIDA" | "ATUAL" | "BLOQUEADA";
+    opcoes: OpcaoExpedicao[];
+  }>;
+  chefe: OpcaoExpedicao & {
+    status: "CONCLUIDA" | "ATUAL" | "BLOQUEADA";
+  };
+  dialogoBoss: {
+    nome: string;
+    provocacao: string;
+    pergunta: string;
+    resultado: {
+      pergunta: string;
+      resposta: string;
+      reacao: string;
+      nota: number;
+      multiplicador: number;
+      modo: "IA" | "LOCAL";
+    } | null;
+  } | null;
+  opcoesAtuais: OpcaoExpedicao[];
+  partidaAtual: {
+    id: string;
+    status: "EM_ANDAMENTO" | "FINALIZADA";
+    resultado: "VITORIA" | "DERROTA" | "EMPATE" | null;
+  } | null;
+  recompensaFinal: number;
+  recompensaPendente: number;
+  rubysPerdidos: number;
+  rubysAssegurados: number;
+  criadoEm: string;
+  finalizadoEm: string | null;
+};
+
+export function responderBossExpedicao(idExpedicao: string, resposta: string) {
+  return jogoRequest<EstadoExpedicao>(
+    `/expedicoes/${idExpedicao}/boss/resposta`,
+    { method: "POST", body: JSON.stringify({ resposta }) },
+  );
+}
+
+export function buscarExpedicaoAtual() {
+  return jogoRequest<EstadoExpedicao | null>("/expedicoes/atual");
+}
+
+export function iniciarExpedicao(idDeck: string) {
+  return jogoRequest<EstadoExpedicao>("/expedicoes", {
+    method: "POST",
+    body: JSON.stringify({ idDeck }),
+  });
+}
+
+export function escolherRotaExpedicao(idExpedicao: string, idEscolha: string) {
+  return jogoRequest<EstadoExpedicao>(`/expedicoes/${idExpedicao}/escolhas`, {
+    method: "POST",
+    body: JSON.stringify({ idEscolha }),
+  });
+}
+
+export function abandonarExpedicao(idExpedicao: string) {
+  return jogoRequest<EstadoExpedicao>(`/expedicoes/${idExpedicao}/abandonar`, {
+    method: "POST",
+  });
+}
+
+export type CartaGachaApi = {
+  id: string;
+  nome: string;
+  raridade: string;
+  elemento: "natureza" | "agua" | "fogo" | "sombra" | "luz";
+  foto: string | null;
+  moldura: string | null;
+  configVisual: ConfigVisualCarta | null;
+  taxaDrop?: number;
+  quantidade?: number;
+  nova?: boolean;
+  valorVenda?: number;
+};
+
+export type BannerGacha = {
+  id: string;
+  nome: string;
+  custoGiro: number;
+  custoDez: number;
+  pity: number;
+  limitePity: number;
+  pities: { raridade: string; limite: number; atual: number }[];
+  diarioDisponivel: boolean;
+  cartas: CartaGachaApi[];
+};
+
+export type GachaResponse = {
+  proximoGiroGratuitoEm: string;
+  jogador: { nome: string; nivel: number; rubys: number };
+  probabilidades: {
+    raridade: CartaGachaApi["raridade"];
+    percentual: number;
+  }[];
+  rotacao: {
+    bannerAtualId: string;
+    proximaRotacaoEm: string | null;
+    forcadoPorAdmin: boolean;
+  } | null;
+  banners: BannerGacha[];
+};
+
+export function buscarGacha() {
+  return jogoRequest<GachaResponse>("/gacha/banners", { cache: "no-store" });
+}
+
+export function girarGacha(idBanner: string, quantidade: 1 | 10) {
+  return jogoRequest<{
+    cartas: CartaGachaApi[];
+    pity: number;
+    pities: { raridade: string; limite: number; atual: number }[];
+    rubys: number;
+    custo: number;
+    rubysGanhosDuplicatas: number;
+  }>("/gacha/girar", {
+    method: "POST",
+    body: JSON.stringify({ idBanner, quantidade }),
+  });
+}
+
+export function resgatarGiroDiario(idBanner: string) {
+  return jogoRequest<{ message: string; rubysRecebidos: number }>(
+    "/gacha/diario",
+    {
+      method: "POST",
+      body: JSON.stringify({ idBanner }),
+    },
+  );
+}
+
+export type RecompensasResponse = {
+  semanal: {
+    disponivel: boolean;
+    rubys: number;
+    proximaRenovacaoEm: string;
+  };
+  saldoRubys: number;
+};
+
+export function buscarRecompensas() {
+  return jogoRequest<RecompensasResponse>("/recompensas");
+}
+
+export function resgatarRecompensaSemanal() {
+  return jogoRequest<{
+    message: string;
+    rubysRecebidos: number;
+    proximaRenovacaoEm: string;
+  }>("/recompensas/semanal", { method: "POST" });
+}

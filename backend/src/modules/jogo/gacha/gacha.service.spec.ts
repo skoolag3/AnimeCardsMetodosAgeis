@@ -1,0 +1,129 @@
+import { ConflictException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { GachaService } from './gacha.service';
+import {
+  giroGratuitoDisponivel,
+  obterProximaRotacaoBanner,
+  obterProximoGiroGratuito,
+} from './gacha.config';
+
+describe('GachaService', () => {
+  const prisma = {
+    banner: { findFirst: jest.fn() },
+    ledgerRuby: { create: jest.fn() },
+    $queryRaw: jest.fn(),
+    $executeRaw: jest.fn(),
+    $transaction: jest.fn(),
+  };
+  prisma.$transaction.mockImplementation(
+    (operacao: (tx: typeof prisma) => unknown) => operacao(prisma),
+  );
+  const service = new GachaService(prisma as never, { obterAtual: jest.fn().mockResolvedValue({ idBanner: 'banner' }) } as never);
+
+  afterEach(() => jest.restoreAllMocks());
+
+  it('faz sorteio ponderado respeitando a faixa acumulada', () => {
+    jest.spyOn(service as unknown as { numeroAleatorio: () => number }, 'numeroAleatorio').mockReturnValue(0);
+    const primeira = { id: 'ur', taxa_drop: new Prisma.Decimal(1) };
+    const segunda = { id: 'n', taxa_drop: new Prisma.Decimal(50) };
+    expect(service['sortear']([primeira, segunda])).toBe(primeira);
+  });
+
+  it.each([
+    [0, 'UR'],
+    [0.01, 'SSR'],
+    [0.05, 'SR'],
+    [0.2, 'R'],
+    [0.5, 'N'],
+  ])('sorteia a raridade pela faixa percentual %s', (aleatorio, raridade) => {
+    jest.spyOn(service as unknown as { numeroAleatorio: () => number }, 'numeroAleatorio').mockReturnValue(aleatorio);
+    expect(service['sortearRaridade']()).toBe(raridade);
+  });
+
+  it('informa a chance efetiva quando faltam raridades no banner', () => {
+    const cartas = [
+      { carta: { raridade: 'UR' } },
+      { carta: { raridade: 'SSR' } },
+      { carta: { raridade: 'N' } },
+    ];
+
+    expect(service['calcularProbabilidadesEfetivas'](cartas)).toEqual([
+      { raridade: 'UR', percentual: 1 },
+      { raridade: 'SSR', percentual: 4 },
+      { raridade: 'N', percentual: 95 },
+    ]);
+  });
+
+  it('impede giro gratuito antes de 12 horas', async () => {
+    prisma.banner.findFirst.mockResolvedValue({
+      id: 'banner',
+      custo_giro: 300,
+    });
+    prisma.$queryRaw.mockResolvedValue([{ agora: new Date() }]);
+    prisma.$executeRaw.mockResolvedValue(0);
+    await expect(
+      service.resgatarDiario('usuario', 'banner'),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(prisma.ledgerRuby.create).not.toHaveBeenCalled();
+  });
+
+  it('credita o giro somente depois da trava atômica do banco', async () => {
+    prisma.banner.findFirst.mockResolvedValue({
+      id: 'banner',
+      custo_giro: 300,
+    });
+    prisma.$queryRaw.mockResolvedValue([
+      { agora: new Date('2026-09-24T13:00:00.000Z') },
+    ]);
+    prisma.$executeRaw.mockResolvedValue(1);
+
+    await expect(service.resgatarDiario('usuario', 'banner')).resolves.toEqual({
+      message: 'Giro gratuito resgatado.',
+      rubysRecebidos: 300,
+    });
+    expect(prisma.ledgerRuby.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('renova o giro gratuito nas janelas globais de 01:00 e 13:00 UTC', () => {
+    const antesDaJanela = new Date('2026-08-30T12:59:59.999Z').getTime();
+    const inicioDaJanela = new Date('2026-08-30T13:00:00.000Z').getTime();
+    const coletaAnterior = new Date('2026-08-30T01:00:00.000Z');
+
+    expect(giroGratuitoDisponivel(coletaAnterior, antesDaJanela)).toBe(false);
+    expect(giroGratuitoDisponivel(coletaAnterior, inicioDaJanela)).toBe(true);
+    expect(obterProximoGiroGratuito(inicioDaJanela)).toEqual(
+      new Date('2026-08-31T01:00:00.000Z'),
+    );
+  });
+
+  it.each([
+    ['2026-08-30T12:02:15.000Z', '2026-08-30T12:30:00.000Z'],
+    ['2026-08-30T12:30:00.000Z', '2026-08-30T13:00:00.000Z'],
+    ['2026-08-30T23:48:00.000Z', '2026-08-31T00:00:00.000Z'],
+  ])('alinha a rotação global de %s para %s', (agora, proxima) => {
+    expect(obterProximaRotacaoBanner(new Date(agora).getTime())).toEqual(
+      new Date(proxima),
+    );
+  });
+
+  it('aplica pity durante dez giros e reinicia após cada garantia', async () => {
+    const cartaN = { id: 'n', nome: 'Comum', raridade: 'N', elemento: 'FOGO', foto: null, moldura: null, config_visual: null };
+    const cartaUR = { ...cartaN, id: 'ur', nome: 'Ultra', raridade: 'UR' };
+    const tx = {
+      usuario: { findUnique: jest.fn().mockResolvedValue({ saldo_rubys_cache: 10000 }) },
+      banner: { findFirst: jest.fn().mockResolvedValue({ nome: 'Teste', custo_giro: 100, configuracao: { chances: [{ raridade: 'UR', percentual: 1 }, { raridade: 'N', percentual: 99 }], pities: [{ raridade: 'UR', limite: 3 }] }, cartas: [{ id_carta: 'n', taxa_drop: new Prisma.Decimal(1), carta: cartaN }, { id_carta: 'ur', taxa_drop: new Prisma.Decimal(1), carta: cartaUR }] }) },
+      logGacha: { findFirst: jest.fn().mockResolvedValue({ pity_contador: 1 }), findMany: jest.fn().mockResolvedValue([{ cartaObtida: { raridade: 'N' } }]), create: jest.fn() },
+      ledgerRuby: { create: jest.fn() },
+      inventario: { findUnique: jest.fn().mockResolvedValue(null), upsert: jest.fn().mockResolvedValue({ quantidade: 1 }) },
+      raridadeCarta: { findUnique: jest.fn() },
+    };
+    const banco = { $transaction: jest.fn((operacao: (cliente: typeof tx) => unknown) => operacao(tx)) };
+    const gacha = new GachaService(banco as never, { obterAtual: jest.fn().mockResolvedValue({ idBanner: 'banner' }) } as never);
+    jest.spyOn(gacha as unknown as { numeroAleatorio: () => number }, 'numeroAleatorio').mockReturnValue(0.99);
+    const res = await gacha.girar('usuario', 'banner', 10);
+    expect(res.cartas.map((carta) => carta.raridade)).toEqual(['N', 'UR', 'N', 'N', 'UR', 'N', 'N', 'UR', 'N', 'N']);
+    expect(res.pities).toEqual([{ raridade: 'UR', limite: 3, atual: 2 }]);
+    expect(res.custo).toBe(900);
+    expect(tx.logGacha.create).toHaveBeenCalledTimes(10);
+  });
+});

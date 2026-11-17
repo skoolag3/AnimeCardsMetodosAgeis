@@ -1,0 +1,117 @@
+.iconeItemSeguranca {
+  display: grid;
+  place-items: center;
+  background: #4c1d9524;
+  color: #a78bfa;
+}
+
+.iconeItemSeguranca {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 0.5rem;
+}
+
+.iconeItemSeguranca svg {
+  width: 1rem;
+}
+
+.listaSeguranca {
+  overflow: hidden;
+  border: 1px solid #5865853d;
+  border-radius: 0.9rem;
+}
+
+.itemSeguranca,
+.itemGoogle {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: center;
+  min-height: 3.55rem;
+  padding: 0.5rem 0.7rem;
+}
+
+.itemSeguranca + .itemSeguranca,
+.itemGoogle {
+  border-top: 1px solid #58658533;
+}
+
+.itemSeguranca small,
+.itemSeguranca strong,
+.itemGoogle small,
+.itemGoogle strong {
+  display: block;
+}
+
+.itemSeguranca small,
+.itemGoogle small {
+  color: #8f98ac;
+  font-size: 0.67rem;
+}
+
+.itemSeguranca strong,
+.itemGoogle strong {
+  margin-top: 0.22rem;
+  color: #e1e5ed;
+  font-size: 0.78rem;
+}
+
+.itemSeguranca > button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid #8b5cf647;
+  border-radius: 50%;
+  background: #4c1d951f;
+  color: #c4b5fd;
+  cursor: pointer;
+}
+
+.itemSeguranca > button svg {
+  width: 0.78rem;
+}
+
+.senhaMascarada {
+  letter-spacing: 0.13em;
+}
+
+.iconeGoogle {
+  display: grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #f8fafc;
+  color: #4285f4;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.btnGoogle {
+  min-height: 2.5rem;
+  border: 1px solid #60a5fa66;
+  border-radius: 0.45rem;
+  background: #f8fafc;
+  color: #26334d;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0 0.8rem;
+}
+
+.btnGoogle:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+@media (max-width: 650px) {
+  .itemGoogle {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .itemGoogle .btnGoogle {
+    grid-column: 1 / -1;
+  }
+}

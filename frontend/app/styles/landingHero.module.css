@@ -1,0 +1,126 @@
+.hero {
+  position: relative;
+  min-height: min(56rem, 100svh);
+  background: transparent;
+
+  /*
+   * Glow roxo antigo. Mantido comentado para facilitar comparação visual.
+   * O ShaderBackground agora é o único fundo artístico do hero.
+   *
+   * background:
+   *   radial-gradient(circle at 76% 39%, rgba(139, 92, 246, 0.17), transparent 24rem),
+   *   radial-gradient(circle at 19% 78%, rgba(148, 163, 184, 0.025), transparent 20rem),
+   *   linear-gradient(112deg, rgba(5, 6, 10, 0.99), rgba(10, 9, 17, 0.94) 50%, rgba(7, 9, 13, 0.9)),
+   *   var(--corBg);
+   */
+}
+
+.shaderHero {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+/* Grade antiga do hero comentada para o shader permanecer contínuo. */
+
+/*
+ * Fade antigo do final do hero. Ele criava uma faixa sólida antes de Notícias.
+ * .hero::after { ... }
+ */
+
+.particulas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * Neblinas antigas das partículas. A camada inferior terminava junto do hero
+ * e criava uma faixa visível antes de Notícias.
+ * .particulas::before,
+ * .particulas::after { ... }
+ */
+
+.particulas span {
+  position: absolute;
+  left: var(--posEsquerda);
+  top: var(--posTopo);
+  width: var(--tamanho);
+  height: var(--tamanho);
+  border-radius: 999px;
+  background: var(--corRoxoClaro);
+  box-shadow: 0 0 1rem rgba(167, 139, 250, 0.58);
+  opacity: 0.44;
+  animation: flutuarParticula var(--duracao) ease-in-out infinite alternate;
+}
+
+@keyframes flutuarParticula {
+  from {
+    transform: translate3d(0, 0, 0) scale(0.7);
+  }
+
+  to {
+    transform: translate3d(2.6rem, -3.8rem, 0) scale(1.25);
+  }
+}
+
+.gradeHero {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(19rem, 32rem) minmax(26rem, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  width: min(100% - 2rem, 94rem);
+  min-height: inherit;
+  margin: 0 auto;
+  padding: clamp(6.3rem, 9vh, 7.2rem) 0 1.4rem;
+}
+
+/*
+ * Glows roxos antigos da grade. O novo background já entrega a profundidade.
+ *
+ * .gradeHero::before,
+ * .gradeHero::after { ... }
+ */
+
+.conteudoHero {
+  position: relative;
+  z-index: 4;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  padding-top: clamp(1.1rem, 3vh, 2.1rem);
+  padding-bottom: 0;
+}
+
+.tituloHero {
+  font-style: italic;
+  margin: 0;
+  color: var(--corTexto);
+  max-width: 11ch;
+  font-size: clamp(3.1rem, 5vw, 4.85rem);
+  font-weight: 950;
+  line-height: 0.91;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+}
+
+.tituloHero span {
+  color: #d9f99d;
+  text-shadow: none;
+}
+
+.textoHero {
+  max-width: 29rem;
+  margin: 1.25rem 0 0;
+  color: #dad8e8;
+  font-size: 0.98rem;
+  line-height: 1.65;
+}

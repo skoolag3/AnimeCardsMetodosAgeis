@@ -1,0 +1,9 @@
+{
+  "name": "plataforma-web-rpg-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Comandos locais de desenvolvimento da Plataforma Web RPG",
+  "scripts": {
+    "startproject": "node ../plataforma-web-rpg-arquivos/scripts/startproject.js"
+  }
+}

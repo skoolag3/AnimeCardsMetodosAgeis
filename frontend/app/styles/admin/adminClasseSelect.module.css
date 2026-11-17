@@ -1,0 +1,181 @@
+.campoClasse {
+  display: grid;
+  min-width: 0;
+  align-self: start;
+  gap: 0.35rem;
+}
+
+.cabecalhoClasse {
+  display: flex;
+  min-height: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.cabecalhoClasse > span {
+  color: #cbd5e1;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.acoesClasse {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.acoesClasse > small {
+  color: #9ca3af;
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+
+.acoesClasse > button {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 1px solid #30384a;
+  border-radius: 0.4rem;
+  background: #0b0e17;
+  color: #eef0f7;
+  cursor: pointer;
+  padding: 0;
+}
+
+.acoesClasse > button svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.acoesClasse > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.linhaSelect {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.selectClasse {
+  height: 2.65rem;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.fundoModal {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 4, 10, 0.78);
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.modalClasse {
+  display: grid;
+  width: min(34rem, 100%);
+  gap: 0.8rem;
+  border: 1px solid #45306f;
+  border-radius: 0.9rem;
+  color: #eef0f7;
+  background: #090d17;
+  padding: 1rem;
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.45);
+}
+
+.modalClasse header,
+.modalClasse footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.modalClasse header {
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid #202738;
+}
+
+.modalClasse h2 {
+  margin: 0.15rem 0 0;
+  font-size: 1.15rem;
+}
+
+.modalClasse header small {
+  color: #a78bfa;
+  font-size: 0.57rem;
+  text-transform: uppercase;
+}
+
+.modalClasse label {
+  display: grid;
+  gap: 0.3rem;
+  color: #aeb6c6;
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.modalClasse input {
+  min-width: 0;
+  min-height: 2.45rem;
+  border: 1px solid #30384a;
+  border-radius: 0.6rem;
+  color: white;
+  background: #070a12;
+  padding: 0 0.65rem;
+}
+
+.gradeNumeros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.checkAtiva {
+  display: flex !important;
+  align-items: center;
+}
+
+
+.modalClasse button {
+  display: inline-flex;
+  min-height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid #3c465c;
+  border-radius: 0.6rem;
+  color: #e5e7eb;
+  background: #111625;
+  padding: 0 0.75rem;
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.modalClasse footer button:last-child {
+  border-color: #7143c4;
+  background: #6d28d9;
+}
+
+.modalClasse button svg {
+  width: 0.9rem;
+}
+
+.erro {
+  margin: 0;
+  color: #fca5a5;
+  font-size: 0.63rem;
+}
+
+@media (max-width: 560px) {
+  .gradeNumeros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

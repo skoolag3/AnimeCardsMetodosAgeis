@@ -1,0 +1,618 @@
+.layout {
+  display: block;
+}
+
+.lista {
+  width: 100%;
+}
+
+.lista > div:has(.tabelaNoticias) {
+  display: block;
+  max-height: none;
+  overflow: auto;
+  padding: 0;
+}
+.tabelaNoticias {
+  min-width: 42rem !important;
+}
+.tabelaNoticias th:last-child,
+.tabelaNoticias td:last-child {
+  width: 5.5rem;
+}
+.noticiaPrincipal {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.55rem;
+}
+.noticiaPrincipal > img,
+.noticiaPrincipal > span {
+  width: 3.2rem;
+  height: 2.2rem;
+  flex: 0 0 auto;
+  border-radius: 0.35rem;
+  object-fit: cover;
+}
+.noticiaPrincipal > span {
+  display: grid;
+  place-items: center;
+  background: #11182a;
+  color: #7c8aa2;
+}
+.noticiaPrincipal > span svg {
+  width: 0.9rem;
+}
+.noticiaPrincipal > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+}
+.noticiaPrincipal strong,
+.noticiaPrincipal small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.noticiaPrincipal strong {
+  color: #f8fafc;
+  font-size: 0.72rem;
+}
+.noticiaPrincipal small {
+  max-width: 34rem;
+  color: #758299;
+  font-size: 0.58rem;
+}
+.categoria {
+  color: #b7a3ee;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+.tabelaNoticias nav button:last-child {
+  color: #fca5a5;
+}
+.modalFundo {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 4, 10, 0.82);
+  padding: 1rem;
+  backdrop-filter: blur(6px);
+}
+.confirmarExclusao {
+  width: min(100%, 25rem);
+  border: 1px solid rgba(248, 113, 113, 0.24);
+  border-radius: 0.8rem;
+  background: #090d18;
+  padding: 1rem;
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.52);
+}
+.confirmarExclusao > svg {
+  width: 1.25rem;
+  color: #f87171;
+}
+.confirmarExclusao h2 {
+  margin: 0.6rem 0 0;
+  font-size: 1rem;
+}
+.confirmarExclusao p {
+  margin: 0.25rem 0 1rem;
+  color: #8b97aa;
+  font-size: 0.68rem;
+}
+.confirmarExclusao > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.confirmarExclusao button {
+  min-height: 2.35rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 0.48rem;
+  background: rgba(15, 23, 42, 0.7);
+  color: #dbe4f4;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+.confirmarExclusao button:last-child {
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(127, 29, 29, 0.3);
+  color: #fecaca;
+}
+.lista,
+.formulario {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 0.8rem;
+  background: rgba(8, 13, 26, 0.78);
+}
+.lista > header,
+.formulario > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  padding: 0.6rem 0.7rem;
+}
+.lista header div,
+.formulario header div {
+  display: grid;
+  gap: 0.1rem;
+}
+.lista header strong,
+.formulario header strong {
+  font-size: 0.78rem;
+}
+.lista header small,
+.formulario header small {
+  color: #77849a;
+  font-size: 0.58rem;
+}
+.lista button,
+.formulario :where(button:not([role="switch"])) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: 1px solid rgba(167, 139, 250, 0.24);
+  border-radius: 0.45rem;
+  background: rgba(124, 58, 237, 0.14);
+  color: #ddd6fe;
+  cursor: pointer;
+  padding: 0.4rem 0.55rem;
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.lista button svg,
+.formulario button svg {
+  width: 0.78rem;
+  height: 0.78rem;
+}
+.lista > div {
+  display: grid;
+  gap: 0.38rem;
+  max-height: 34rem;
+  overflow: auto;
+  padding: 0.55rem;
+}
+.lista article {
+  display: grid;
+  grid-template-columns: 4.4rem minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 0.55rem;
+  background: #080d19;
+  padding: 0.42rem;
+}
+.lista article > img,
+.lista article > span {
+  width: 4.4rem;
+  height: 2.8rem;
+  border-radius: 0.38rem;
+  object-fit: cover;
+}
+.lista article > span {
+  display: grid;
+  place-items: center;
+  background: #11182a;
+  color: #7c8aa2;
+}
+.lista article > span svg {
+  width: 1rem;
+}
+.lista article > div {
+  min-width: 0;
+}
+.lista article small,
+.lista article strong,
+.lista article p {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lista article small {
+  color: #a78bfa;
+  font-size: 0.48rem;
+}
+.lista article strong {
+  margin: 0.12rem 0;
+  color: #f8fafc;
+  font-size: 0.68rem;
+}
+.lista article p {
+  margin: 0;
+  color: #77849a;
+  font-size: 0.55rem;
+}
+.lista article nav {
+  display: grid;
+  gap: 0.25rem;
+}
+.lista article nav button {
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+}
+.lista article nav button:last-child {
+  color: #fca5a5;
+}
+.formulario {
+  display: grid;
+  width: min(100%, 48rem);
+  max-height: min(92dvh, 52rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #6d5c9c #111827;
+  gap: 0.5rem;
+  padding-bottom: 0.65rem;
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.52);
+}
+.formulario::-webkit-scrollbar { width: 0.45rem; }
+.formulario::-webkit-scrollbar-track { background: #111827; }
+.formulario::-webkit-scrollbar-thumb { border-radius: 999px; background: #6d5c9c; }
+.formulario::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
+.formulario > header {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background: #080d1a;
+}
+.formulario > label,
+.camposDuplos label {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0 0.75rem;
+  color: #cbd5e1;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.camposDuplos {
+  display: grid;
+  grid-template-columns: 1fr 11rem;
+  gap: 0.55rem;
+  padding: 0 0.75rem;
+}
+.camposDuplos label {
+  margin: 0;
+}
+.formulario input,
+.formulario textarea,
+.formulario select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.45rem;
+  background: #050a15;
+  color: #f8fafc;
+  padding: 0.48rem 0.58rem;
+  font: inherit;
+  font-size: 0.67rem;
+  outline: 0;
+}
+.formulario input:focus,
+.formulario textarea:focus,
+.formulario select:focus {
+  border-color: #8b5cf6;
+}
+.formulario textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+.campoImagemEditor {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0.75rem;
+}
+.imagemCampo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0;
+}
+.imagemCampo > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+.previaImagemWrapper {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.previaImagemWrapper img {
+  width: 7.5rem;
+  height: 3.75rem;
+  border-radius: 0.45rem;
+  object-fit: cover;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.acoesImagem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+.acoesImagem button {
+  min-height: 32px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 0.5rem;
+  background: rgba(124, 58, 237, 0.12);
+  color: #ede9fe;
+  padding: 0.35rem 0.65rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.acoesImagem button:hover {
+  background: rgba(124, 58, 237, 0.22);
+  border-color: rgba(167, 139, 250, 0.55);
+}
+.acoesImagem button:active {
+  transform: scale(0.98);
+}
+.acoesImagem button:last-child {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+}
+.acoesImagem button:last-child:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(248, 113, 113, 0.6);
+}
+.acoesImagem button:focus-visible {
+  outline: 2px solid #bef264;
+  outline-offset: 2px;
+}
+
+.fundoConfirmacaoImagem {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(2, 4, 12, 0.82);
+  backdrop-filter: blur(4px);
+}
+
+.confirmacaoImagem {
+  width: min(100%, 26rem);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  border-radius: 0.85rem;
+  background: #101424;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.5);
+  color: #f8fafc;
+  padding: 1.25rem;
+}
+
+.confirmacaoImagem h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.08rem;
+}
+
+.confirmacaoImagem p {
+  margin: 0;
+  color: #aebbd0;
+  line-height: 1.5;
+  font-size: 0.84rem;
+}
+
+.acoesConfirmacaoImagem {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+
+.acoesConfirmacaoImagem button {
+  min-height: 2.5rem;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.85rem;
+  color: #f8fafc;
+  background: #1a2033;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.acoesConfirmacaoImagem button:first-child:hover {
+  background: #252e47;
+  border-color: rgba(167, 139, 250, 0.5);
+}
+
+.acoesConfirmacaoImagem button:last-child {
+  border-color: #b94a63;
+  background: #7f243d;
+  color: #ffe4e6;
+}
+
+.acoesConfirmacaoImagem button:last-child:hover {
+  background: #9f1c3f;
+  border-color: #f43f5e;
+}
+
+.acoesConfirmacaoImagem button:focus-visible {
+  outline: 2px solid #bef264;
+  outline-offset: 2px;
+}
+.anexos {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0.75rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 0.6rem;
+}
+.anexos > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.anexos > header strong {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+}
+.anexos > header svg {
+  width: 0.8rem;
+}
+.anexos > div {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr auto;
+  gap: 0.35rem;
+}
+.anexos > div button {
+  width: 2rem;
+  padding: 0;
+}
+.formulario .publicar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0.75rem;
+}
+.salvar {
+  min-height: 2.5rem;
+  margin: 0 0.75rem;
+  background: linear-gradient(135deg, #6d28d9, #9333ea) !important;
+  color: #fff !important;
+}
+.erro {
+  margin: 0 0.75rem;
+  color: #fca5a5;
+  font-size: 0.62rem;
+}
+
+.erroLista {
+  margin: 0;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 0.45rem;
+  background: rgba(127, 29, 29, 0.12);
+  padding: 0.65rem;
+  color: #fca5a5;
+  font-size: 0.62rem;
+}
+.vazio {
+  padding: 2rem;
+  color: #77849a;
+  font-size: 0.65rem;
+  text-align: center;
+}
+@media (max-width: 900px) {
+  .lista > div {
+    max-height: none;
+  }
+}
+@media (max-width: 720px) {
+  .lista > .cartasListaTopo,
+  .lista > header {
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+  }
+
+  .tabelaNoticias,
+  .tabelaNoticias tbody {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .tabelaNoticias thead {
+    display: none;
+  }
+
+  .tabelaNoticias tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem 0.65rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+    padding: 0.75rem 0.8rem;
+  }
+
+  .tabelaNoticias tbody td {
+    display: flex;
+    align-items: center;
+    width: auto !important;
+    min-width: 0;
+    border: 0 !important;
+    padding: 0 !important;
+  }
+
+  .tabelaNoticias tbody td[data-label="Publicação"] {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .tabelaNoticias tbody td[data-label="Categoria"] {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .tabelaNoticias tbody td[data-label="Status"] {
+    grid-column: 1;
+    grid-row: 2;
+    margin-left: 5.5rem;
+  }
+
+  .tabelaNoticias tbody td[data-label="Ações"] {
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: flex-end;
+  }
+}
+@media (max-width: 560px) {
+  .modalFundo {
+    padding: 0.55rem;
+  }
+  .formulario {
+    max-height: calc(100dvh - 1.1rem);
+  }
+  .campoImagemEditor {
+    margin: 0 0.5rem;
+  }
+  .imagemCampo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .previaImagemWrapper img {
+    width: 100%;
+    max-width: 14rem;
+    height: auto;
+    aspect-ratio: 2 / 1;
+  }
+  .acoesImagem {
+    width: 100%;
+  }
+  .acoesImagem button {
+    flex: 1 1 7rem;
+    justify-content: center;
+  }
+  .camposDuplos {
+    grid-template-columns: 1fr;
+  }
+  .anexos > div {
+    grid-template-columns: 1fr auto;
+  }
+  .anexos > div input:nth-child(2) {
+    grid-column: 1;
+  }
+}

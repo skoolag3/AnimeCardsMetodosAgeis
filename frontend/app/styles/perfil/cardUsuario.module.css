@@ -1,0 +1,611 @@
+.cardUsuario {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--member-border);
+  border-radius: calc(var(--member-radius) + 0.2rem);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.035), transparent 46%),
+    var(--member-surface);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.05),
+    0 1.2rem 3rem rgba(0, 0, 0, 0.16);
+}
+
+.biografiaUsuario button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid #a78bfa6b;
+  border-radius: 50%;
+  background: #080c1ae0;
+  color: #e5e7eb;
+  cursor: pointer;
+}
+
+.biografiaUsuario button svg {
+  width: 0.8rem;
+}
+
+.identidadeUsuario {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.avatarArea {
+  position: relative;
+  grid-row: 1 / span 2;
+  width: 6.8rem;
+  height: 6.8rem;
+  aspect-ratio: 1 / 1;
+  margin-top: 0;
+}
+
+.avatarUsuario {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid #a78bfad9;
+  border-radius: 1rem;
+  background-color: #211d31;
+  background-position: center;
+  background-size: cover;
+  cursor: pointer;
+  padding: 0;
+}
+
+.avatarSomenteLeitura,
+.btnMoldura.molduraSomenteLeitura {
+  cursor: default;
+}
+
+.btnEditarFoto {
+  position: absolute;
+  right: 0.15rem;
+  top: 0.15rem;
+  z-index: 4;
+  display: grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  place-items: center;
+  border: 1px solid #bca9e783;
+  border-radius: 0.45rem;
+  background: #11101bdb;
+  color: #d7c9ee;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.btnEditarFoto:hover,
+.btnEditarFoto:focus-visible {
+  border-color: #c4b5fd;
+  background: #32204f;
+  outline: 1px solid #c4b5fd;
+  outline-offset: 2px;
+}
+
+.btnEditarFoto svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.abasAparencia {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+  padding: 0.25rem;
+  border: 1px solid #63557e70;
+  border-radius: 0.75rem;
+  background: #0b0e19;
+}
+
+.abasAparencia button {
+  min-height: 2.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #aaa4ba;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.abasAparencia button:hover,
+.abasAparencia button:focus-visible {
+  color: #f4ecff;
+  outline: 1px solid #aa84ef;
+}
+
+.abasAparencia .abaAtiva {
+  border-color: #9d75dd80;
+  background: #291c46;
+  color: #f4ecff;
+}
+
+.listaFotosCartas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.8rem, 1fr));
+  gap: 0.8rem;
+  max-height: min(55vh, 30rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #7c3aed #111421;
+  scrollbar-width: thin;
+  padding: 0.15rem 0.2rem 0.3rem;
+}
+
+.listaFotosCartas button {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 0.3rem;
+  border: 1px solid #59638078;
+  border-radius: 0.85rem;
+  background: #111625;
+  color: #f7f7fb;
+  cursor: pointer;
+  padding: 0.5rem;
+  text-align: left;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.listaFotosCartas button:hover,
+.listaFotosCartas button:focus-visible {
+  border-color: #a78bfa;
+  background: #1b1930;
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.listaFotosCartas button:active {
+  transform: translateY(0);
+}
+
+.listaFotosCartas button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.listaFotosCartas .fotoSelecionada {
+  border-color: #b99cff;
+  box-shadow: inset 0 0 0 1px #b99cff80;
+}
+
+.listaFotosCartas img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.listaFotosCartas span {
+  overflow: hidden;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listaFotosCartas small {
+  color: #aeb5c4;
+  font-size: 0.67rem;
+}
+
+.avisoFotos {
+  margin: 0.8rem 0 0;
+  color: #aeb5c4;
+  font-size: 0.8rem;
+}
+
+.avatarUsuario > svg {
+  z-index: 2;
+  width: 3.6rem;
+  color: #d8d2e8;
+  filter: none;
+}
+
+.brilhoAvatar {
+  display: none;
+}
+
+.molduraCartaAvatar {
+  position: absolute;
+  inset: -0.32rem;
+  z-index: 3;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+  transform: translate(var(--perfilMolduraX), var(--perfilMolduraY))
+    rotate(var(--perfilMolduraRotacao))
+    scale(var(--perfilMolduraEscalaX), var(--perfilMolduraEscalaY));
+}
+
+.molduraCartaAvatar::before {
+  position: absolute;
+  inset: 0;
+  background-image: inherit;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  content: "";
+  opacity: 0.86;
+  transform: scale(0.94);
+}
+
+.dadosUsuario {
+  align-self: center;
+  min-width: 0;
+}
+
+.nomeUsuario {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.nomeUsuario h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.nomeUsuario button {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 1px solid #8b5cf652;
+  border-radius: 50%;
+  background: #4c1d9529;
+  color: #c4b5fd;
+  cursor: pointer;
+}
+
+.nomeUsuario button svg {
+  width: 0.75rem;
+}
+
+.nivelUsuario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  color: #b794f6;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.nivelUsuario svg,
+.btnCopiarId svg {
+  width: 1rem;
+}
+
+.btnCopiarId,
+.btnMoldura {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.btnCopiarId {
+  position: relative;
+  margin-top: 0.45rem;
+  color: #a9b0c0;
+  font-size: 0.72rem;
+}
+
+.btnCopiarId small {
+  position: absolute;
+  left: 100%;
+  margin-left: 0.5rem;
+  color: #c4b5fd;
+}
+
+.biografiaUsuario {
+  display: grid;
+  grid-column: 2;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+  max-width: 34rem;
+  align-items: center;
+  gap: 0.12rem 0.5rem;
+  margin-top: 0.35rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.5rem;
+  background: rgba(8, 12, 26, 0.5);
+  padding: 0.45rem 0.55rem;
+}
+
+.biografiaUsuario span {
+  grid-column: 1;
+  color: #a8aebd;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.biografiaUsuario p {
+  grid-column: 1;
+  min-width: 0;
+  margin: 0;
+  color: #d4d7e2;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.biografiaUsuario button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  background: transparent;
+}
+
+.btnMoldura {
+  margin-top: 0.4rem;
+  color: #a987ff;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.btnMoldura svg {
+  width: 0.9rem;
+}
+
+.listaStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0 1rem;
+  border-top: 1px solid #58658540;
+  padding: 0.7rem 0 0.8rem;
+}
+
+.listaStats > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-right: 1px solid #58658540;
+}
+
+.listaStats > div:last-child {
+  border-right: 0;
+}
+
+.listaStats svg {
+  width: 1.45rem;
+}
+
+.listaStats dt {
+  color: #abb2c1;
+  font-size: 0.76rem;
+}
+
+.listaStats dd {
+  margin: 0.18rem 0 0;
+  font-weight: 800;
+}
+
+.statVitoria svg {
+  color: #9b6cff;
+}
+
+.statDerrota svg {
+  color: #f43f5e;
+}
+
+.statRanking svg {
+  color: #fbbf24;
+}
+
+.inputArquivo {
+  display: none;
+}
+
+.listaMolduras {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.listaMolduras button {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.7rem;
+  align-items: center;
+  border: 1px solid #717d9e4d;
+  border-radius: 0.5rem;
+  background: #02061080;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.7rem;
+  text-align: left;
+}
+
+.listaMolduras button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.btnPagina {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.45rem;
+  background: #0d111d;
+  color: #e2e8f0;
+  padding: 0.35rem 0.65rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnPagina:hover:not(:disabled) {
+  background: #1a2235;
+  border-color: #8b5cf6;
+  color: #fff;
+}
+
+.btnPagina:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnPagina svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.amostraMoldura {
+  position: relative;
+  width: 2.1rem;
+  height: 2.1rem;
+  overflow: visible;
+  border-radius: 0.35rem;
+}
+
+.imagemAmostraMoldura {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+  transform: translate(var(--perfilMolduraX), var(--perfilMolduraY))
+    rotate(var(--perfilMolduraRotacao))
+    scale(var(--perfilMolduraEscalaX), var(--perfilMolduraEscalaY));
+}
+
+.listaMolduras small {
+  color: #aeb5c4;
+}
+
+.molduraPadrao {
+  border: 1px solid #a797c9;
+  box-shadow: 0 0 0 2px #55466e, 0 0 0.7rem #8b5cf640;
+}
+
+.molduraVioleta {
+  box-shadow: 0 0 0 2px #8b5cf6;
+}
+
+.molduraRubi {
+  box-shadow: 0 0 0 2px #ef4444;
+}
+
+.molduraCarta {
+  box-shadow: 0 0 0 1px #a78bfa80;
+}
+
+@media (max-width: 650px) {
+  .listaMolduras button {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.65rem;
+    min-width: 0;
+  }
+
+  .listaMolduras button strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .listaMolduras button small {
+    grid-column: 2;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .identidadeUsuario {
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    text-align: left;
+  }
+
+  .avatarArea {
+    grid-row: 1;
+    width: 5.25rem;
+    height: 5.25rem;
+    margin-top: 0;
+  }
+
+  .dadosUsuario {
+    display: grid;
+    min-width: 0;
+    justify-items: start;
+    align-self: center;
+  }
+
+  .nomeUsuario {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.4rem;
+  }
+
+  .nomeUsuario h2 {
+    overflow-wrap: anywhere;
+    font-size: 1.2rem;
+  }
+  .nomeUsuario button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  .btnCopiarId,
+  .btnMoldura {
+    min-height: 2.5rem;
+  }
+
+  .biografiaUsuario {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    margin-top: 0;
+  }
+
+  .listaStats {
+    margin-inline: 0.9rem;
+  }
+
+  .listaStats > div {
+    gap: 0.4rem;
+  }
+
+  .listaStats svg {
+    width: 1.35rem;
+  }
+
+  .listaStats dt {
+    font-size: 0.64rem;
+  }
+
+  .listaStats dd {
+    font-size: 0.82rem;
+  }
+}

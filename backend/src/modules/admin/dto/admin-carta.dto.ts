@@ -1,0 +1,190 @@
+import {
+  ArrayMaxSize,
+  ArrayUnique,
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
+
+const elementos = ['natureza', 'agua', 'fogo', 'sombra', 'luz'] as const;
+
+export class CreateAdminCartaDto {
+  @IsString()
+  @MaxLength(150)
+  nome: string;
+
+  @IsIn(elementos)
+  elemento: (typeof elementos)[number];
+
+  @IsString()
+  @MaxLength(50)
+  raridade: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  classe?: string;
+
+  @IsOptional()
+  @IsUUID('4')
+  idClasse?: string | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(10000)
+  custo?: number;
+
+  @IsInt()
+  @Min(0)
+  @Max(99999)
+  hpBase: number;
+
+  @IsInt()
+  @Min(0)
+  @Max(99999)
+  danoBase: number;
+
+  @IsInt()
+  @Min(0)
+  @Max(99999)
+  defesaBase: number;
+
+  @IsOptional()
+  @IsObject()
+  passiva?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  foto?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  fotoPerfil?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  moldura?: string;
+
+  @IsOptional()
+  @IsObject()
+  configVisual?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsBoolean()
+  ativo?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @ArrayMaxSize(3)
+  @IsUUID('4', { each: true })
+  habilidadesIds?: string[];
+}
+
+export class UpdateAdminCartaDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  nome?: string;
+
+  @IsOptional()
+  @IsIn(elementos)
+  elemento?: (typeof elementos)[number];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  raridade?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  classe?: string;
+
+  @IsOptional()
+  @IsUUID('4')
+  idClasse?: string | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(10000)
+  custo?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(99999)
+  hpBase?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(99999)
+  danoBase?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(99999)
+  defesaBase?: number;
+
+  @IsOptional()
+  @IsObject()
+  passiva?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  foto?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  fotoPerfil?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  moldura?: string | null;
+
+  @IsOptional()
+  @IsObject()
+  configVisual?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsBoolean()
+  ativo?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  confirmarImpacto?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @ArrayMaxSize(3)
+  @IsUUID('4', { each: true })
+  habilidadesIds?: string[];
+}
+
+export class RemoveAdminCartaDto {
+  @IsString()
+  @MaxLength(150)
+  confirmarNome: string;
+
+  @IsBoolean()
+  confirmarImpacto: boolean;
+}

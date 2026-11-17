@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+:root {
+  --fundo: #ffffff;
+  --frente: #171717;
+  --fonteSans: var(--fonte-outfit), Arial, Helvetica, sans-serif;
+  --fonteMono: "Courier New", Courier, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: #7c3aed #111421;
+  scrollbar-width: thin;
+}
+
+html:has([aria-modal="true"]),
+body:has([aria-modal="true"]) {
+  overflow: hidden;
+}
+
+@supports selector(::-webkit-scrollbar) {
+  :where([aria-modal="true"], [aria-modal="true"] *, [data-modal-overlay], [data-modal-overlay] *) {
+    scrollbar-color: auto;
+    scrollbar-width: auto;
+  }
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  :where([aria-modal="true"], [aria-modal="true"] *, [data-modal-overlay], [data-modal-overlay] *) {
+    scrollbar-color: #7c3aed #111421;
+    scrollbar-width: thin;
+  }
+}
+
+/* Contém o scroll só na raiz do modal; aplicar em todos os descendentes
+   (células com overflow hidden, textos com ellipsis) bloqueava a roda do mouse. */
+:where([aria-modal="true"], [data-modal-overlay]) {
+  overscroll-behavior: contain;
+}
+
+:where([aria-modal="true"], [aria-modal="true"] *, [data-modal-overlay], [data-modal-overlay] *)::-webkit-scrollbar {
+  width: 0.42rem;
+  height: 0.42rem;
+}
+
+:where([aria-modal="true"], [aria-modal="true"] *, [data-modal-overlay], [data-modal-overlay] *)::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+:where([aria-modal="true"], [aria-modal="true"] *, [data-modal-overlay], [data-modal-overlay] *)::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: #111421;
+}
+
+:where([aria-modal="true"], [aria-modal="true"] *, [data-modal-overlay], [data-modal-overlay] *)::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #7c3aed;
+}
+
+:where([aria-modal="true"], [aria-modal="true"] *, [data-modal-overlay], [data-modal-overlay] *)::-webkit-scrollbar-thumb:hover {
+  background: #a78bfa;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0a0a0a;
+    --frente: #ededed;
+  }
+}
+
+body {
+  min-width: 0;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--fundo);
+  color: var(--frente);
+  font-family: var(--fonteSans);
+}
+
+:where(input[type="checkbox"]) {
+  appearance: none;
+  display: inline-grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: none;
+  place-items: center;
+  margin: 0;
+  border: 1.5px solid #7c8aa3;
+  border-radius: .35rem;
+  background: #111827;
+  box-shadow: inset 0 1px rgba(255,255,255,.05);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+:where(input[type="checkbox"])::after {
+  width: .65rem;
+  height: .4rem;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  content: "";
+  transform: translateY(-.08rem) rotate(-45deg) scale(0);
+  transition: transform .18s ease;
+}
+
+:where(input[type="checkbox"]:hover:not(:disabled)) { border-color: #c4b5fd; }
+:where(input[type="checkbox"]:checked) { border-color: #a78bfa; background: #6d28d9; box-shadow: 0 0 .65rem rgba(139,92,246,.22); }
+:where(input[type="checkbox"]:checked)::after { transform: translateY(-.08rem) rotate(-45deg) scale(1); }
+:where(input[type="checkbox"]:focus-visible) { outline: 2px solid #e9d5ff; outline-offset: 3px; }
+:where(input[type="checkbox"]:disabled) { cursor: not-allowed; opacity: .5; }
+
+@media (prefers-reduced-motion: reduce) {
+  :where(input[type="checkbox"]), :where(input[type="checkbox"])::after { transition: none; }
+}
+
+:where(input):-webkit-autofill,
+:where(input):-webkit-autofill:hover,
+:where(input):-webkit-autofill:focus,
+:where(input):-webkit-autofill:active,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  outline: none !important;
+  border-color: #303648 !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  caret-color: #f8fafc !important;
+  box-shadow: 0 0 0 1000px #060914 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #060914 inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
+:where(input):-webkit-autofill:focus,
+input:-webkit-autofill:focus {
+  border-color: #8b5cf6 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1000px #060914 inset, 0 0 0 1px #8b5cf6 !important;
+  -webkit-box-shadow: 0 0 0 1000px #060914 inset, 0 0 0 1px #8b5cf6 !important;
+}
+
+:where(input):-moz-autofill,
+:where(input):autofill,
+input:-moz-autofill,
+input:autofill {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  outline: none !important;
+  border-color: #303648 !important;
+  background: #060914 !important;
+  color: #f8fafc !important;
+}
+
+:where(input):autofill:focus,
+input:autofill:focus {
+  border-color: #8b5cf6 !important;
+  outline: none !important;
+}
+
+.publicRouteLoading {
+  min-height: 100svh;
+  background: #07070b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

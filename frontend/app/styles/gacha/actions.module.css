@@ -1,0 +1,86 @@
+.painelInvocacao {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 0.8rem;
+  background: rgba(5, 8, 15, 0.58);
+  padding: 0.48rem;
+}
+.invocacoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+.invocarUm,
+.invocarDez,
+.btnPrimario,
+.btnSecundario {
+  display: flex;
+  min-height: 2.7rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  padding: 0 0.75rem;
+  font: inherit;
+  font-weight: 900;
+  transition:
+    transform 150ms ease,
+    filter 150ms ease;
+}
+.invocarUm {
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  background: linear-gradient(135deg, #312e81, #6d28d9);
+  color: #fff;
+}
+.invocarDez {
+  border: 1px solid rgba(190, 242, 100, 0.28);
+  background: linear-gradient(135deg, #6d28d9, #9333ea 55%, #84cc16);
+  color: #fff;
+}
+.invocarUm:hover:not(:disabled),
+.invocarDez:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.invocarUm:disabled,
+.invocarDez:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.25);
+  opacity: 0.42;
+}
+.invocarUm span,
+.invocarDez span {
+  font-size: 0.66rem;
+}
+.invocarUm strong,
+.invocarDez strong {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 0.25rem 0.45rem;
+  font-size: 0.58rem;
+}
+.invocarUm svg,
+.invocarDez svg {
+  width: 0.7rem;
+}
+.btnPrimario,
+.btnSecundario {
+  min-width: 10rem;
+  justify-content: center;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #fff;
+}
+.btnPrimario {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+.btnSecundario {
+  background: rgba(15, 23, 42, 0.68);
+}
+@media (max-width: 680px) {
+  .invocacoes {
+    grid-template-columns: 1fr;
+  }
+}

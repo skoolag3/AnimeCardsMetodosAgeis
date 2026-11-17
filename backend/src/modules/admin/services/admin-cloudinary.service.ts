@@ -1,0 +1,255 @@
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
+import { PrismaService } from '../../../database/prisma.service';
+
+type CartaAssetFiles = {
+  foto?: Express.Multer.File[];
+  fotoPerfil?: Express.Multer.File[];
+  moldura?: Express.Multer.File[];
+};
+
+type UploadedAsset = {
+  url: string;
+  publicId: string;
+  format: string;
+  bytes: number;
+  width: number;
+  height: number;
+};
+
+@Injectable()
+export class AdminCloudinaryService {
+  private configured = false;
+  private readonly logger = new Logger(AdminCloudinaryService.name);
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  assinarUploadCarta(tipo: 'foto' | 'fotoPerfil' | 'moldura', fingerprint: string) {
+    this.configureCloudinary();
+    const subpasta = { foto: 'fotos', fotoPerfil: 'perfil', moldura: 'molduras' }[tipo];
+    const folder = this.getFolder(`cartas/${subpasta}`);
+    const publicId = fingerprint;
+    const timestamp = Math.floor(Date.now() / 1000);
+    const overwrite = false;
+    const config = cloudinary.config();
+    const signature = cloudinary.utils.api_sign_request(
+      { folder, public_id: publicId, timestamp, overwrite },
+      config.api_secret!,
+    );
+    return { cloudName: config.cloud_name, apiKey: config.api_key, folder, publicId, timestamp, overwrite, signature };
+  }
+
+  async uploadCartaAssets(files: CartaAssetFiles) {
+    const { foto, fotoPerfil, moldura } = this.extractFiles(files);
+
+    if (!foto && !fotoPerfil && !moldura) {
+      throw new BadRequestException('Envie uma imagem da carta, foto de perfil ou moldura.');
+    }
+
+    const [fotoUpload, fotoPerfilUpload, molduraUpload] = await Promise.all([
+      foto ? this.uploadImage(foto, 'cartas/fotos') : Promise.resolve(null),
+      fotoPerfil ? this.uploadImage(fotoPerfil, 'cartas/perfil') : Promise.resolve(null),
+      moldura
+        ? this.uploadImage(moldura, 'cartas/molduras')
+        : Promise.resolve(null),
+    ]);
+
+    if (fotoPerfilUpload && fotoPerfilUpload.width !== fotoPerfilUpload.height) {
+      await cloudinary.uploader.destroy(fotoPerfilUpload.publicId).catch(() => undefined);
+      throw new BadRequestException('A foto de perfil da carta precisa ser quadrada (1:1).');
+    }
+
+    return {
+      foto: fotoUpload,
+      fotoPerfil: fotoPerfilUpload,
+      moldura: molduraUpload,
+    };
+  }
+
+  async updateCartaAssets(id: string, files: CartaAssetFiles) {
+    const carta = await this.prisma.carta.findUnique({
+      where: { id },
+    });
+
+    if (!carta) {
+      throw new NotFoundException('Carta não encontrada.');
+    }
+
+    const assets = await this.uploadCartaAssets(files);
+
+    const cartaAtualizada =
+      assets.foto || assets.fotoPerfil || assets.moldura
+        ? await this.prisma.carta.update({
+            where: { id },
+            data: {
+              ...(assets.foto ? { foto: assets.foto.url } : {}),
+              ...(assets.fotoPerfil ? { foto_perfil: assets.fotoPerfil.url } : {}),
+              ...(assets.moldura ? { moldura: assets.moldura.url } : {}),
+              atualizado_em: new Date(),
+            },
+          })
+        : carta;
+
+    return {
+      carta: cartaAtualizada,
+      assets,
+    };
+  }
+
+  uploadNoticiaImagem(imagem: Express.Multer.File) {
+    return this.uploadImage(imagem, 'noticias');
+  }
+
+  async removerImagemSeNaoUsada(imagemUrl: string) {
+    const publicId = this.publicIdDaCarta(imagemUrl);
+    if (!publicId) return;
+    try {
+      const [cartas, avatares] = await Promise.all([
+        this.prisma.carta.count({
+          where: { OR: [{ foto: imagemUrl }, { foto_perfil: imagemUrl }, { moldura: imagemUrl }] },
+        }),
+        this.prisma.perfilUsuario.count({ where: { avatar_url: imagemUrl } }),
+      ]);
+      if (cartas > 0 || avatares > 0) return;
+      this.configureCloudinary();
+      await cloudinary.uploader.destroy(publicId, { invalidate: true });
+    } catch (erro) {
+      this.logger.warn(`Não foi possível remover imagem antiga: ${publicId}`, erro instanceof Error ? erro.stack : undefined);
+    }
+  }
+
+  private publicIdDaCarta(imagemUrl: string) {
+    try {
+      const url = new URL(imagemUrl);
+      const cloudName = process.env.CLOUDINARY_URL
+        ? this.parseCloudinaryUrl(process.env.CLOUDINARY_URL).cloudName
+        : process.env.CLOUDINARY_CLOUD_NAME;
+      if (url.hostname !== 'res.cloudinary.com' || url.pathname.split('/')[1] !== cloudName) return null;
+      const caminho = url.pathname.match(/\/image\/upload\/v\d+\/(.+)\.[a-z0-9]+$/i)?.[1];
+      const pasta = this.getFolder('cartas/');
+      const publicId = caminho ? decodeURIComponent(caminho) : null;
+      return publicId?.startsWith(pasta) ? publicId : null;
+    } catch { return null; }
+  }
+
+  private extractFiles(files: CartaAssetFiles) {
+    return {
+      foto: files.foto?.[0],
+      fotoPerfil: files.fotoPerfil?.[0],
+      moldura: files.moldura?.[0],
+    };
+  }
+
+  private uploadImage(
+    file: Express.Multer.File,
+    folder: string,
+  ): Promise<UploadedAsset> {
+    this.configureCloudinary();
+
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: this.getFolder(folder),
+          resource_type: 'image',
+          use_filename: true,
+          unique_filename: true,
+          overwrite: false,
+        },
+        (error, result) => {
+          if (error || !result) {
+            reject(
+              new InternalServerErrorException(
+                'Não foi possível enviar a imagem ao Cloudinary.',
+              ),
+            );
+            return;
+          }
+
+          resolve(this.mapUploadResult(result));
+        },
+      );
+
+      stream.end(file.buffer);
+    });
+  }
+
+  private configureCloudinary() {
+    if (this.configured) {
+      return;
+    }
+
+    if (process.env.CLOUDINARY_URL) {
+      const cloudinaryUrlConfig = this.parseCloudinaryUrl(
+        process.env.CLOUDINARY_URL,
+      );
+      cloudinary.config({
+        cloud_name: cloudinaryUrlConfig.cloudName,
+        api_key: cloudinaryUrlConfig.apiKey,
+        api_secret: cloudinaryUrlConfig.apiSecret,
+        secure: true,
+      });
+      this.configured = true;
+      return;
+    }
+
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+    if (!cloudName || !apiKey || !apiSecret) {
+      throw new InternalServerErrorException(
+        'Configure CLOUDINARY_URL ou CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY e CLOUDINARY_API_SECRET.',
+      );
+    }
+
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+      secure: true,
+    });
+
+    this.configured = true;
+  }
+
+  private getFolder(folder: string) {
+    const root = process.env.CLOUDINARY_ASSET_FOLDER ?? 'anime-cards';
+
+    return `${root}/${folder}`.replace(/\/{2,}/g, '/');
+  }
+
+  private parseCloudinaryUrl(value: string) {
+    try {
+      const url = new URL(value);
+
+      if (url.protocol !== 'cloudinary:' || !url.username || !url.password) {
+        throw new Error('Invalid Cloudinary URL.');
+      }
+
+      return {
+        cloudName: url.hostname,
+        apiKey: decodeURIComponent(url.username),
+        apiSecret: decodeURIComponent(url.password),
+      };
+    } catch {
+      throw new InternalServerErrorException('CLOUDINARY_URL inválida.');
+    }
+  }
+
+  private mapUploadResult(result: UploadApiResponse): UploadedAsset {
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      format: result.format,
+      bytes: result.bytes,
+      width: result.width,
+      height: result.height,
+    };
+  }
+}

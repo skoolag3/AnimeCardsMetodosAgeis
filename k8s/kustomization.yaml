@@ -1,0 +1,26 @@
+resources:
+  - namespace.yaml
+  - postgres.yaml
+  - app.yaml
+  - observability.yaml
+configMapGenerator:
+  - name: prometheus-config
+    namespace: animecards
+    files:
+      - prometheus.yml=prometheus.yml
+  - name: grafana-datasource
+    namespace: animecards
+    files:
+      - prometheus.yml=grafana-datasource.yml
+  - name: grafana-dashboard-provider
+    namespace: animecards
+    files:
+      - provider.yml=grafana-provider.yml
+  - name: grafana-dashboard
+    namespace: animecards
+    files:
+      - animecards.json=grafana-dashboard.json
+  - name: grafana-alerts
+    namespace: animecards
+    files:
+      - alerts.yml=grafana-alerts.yml
