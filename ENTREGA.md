@@ -25,7 +25,7 @@ O Secret de exemplo é apenas um molde. A URL do PostgreSQL precisa refletir a s
 
 ## Validação local de 17/11/2026
 
-O Docker Compose iniciou os sete serviços persistentes, aplicou as 42 migrações e respondeu HTTP 200 na aplicação, em `/api/health` e em `/metrics`. Prometheus mostrou os três alvos `up` e séries de CPU e memória por container. O dashboard e a regra de alerta foram carregados no Grafana. Um cluster `kind-animecards` foi criado e os manifests passaram por `kubectl apply -k k8s`, mas a máquina de 8 GB ficou sem memória suficiente para concluir simultaneamente os pulls dos Pods. O cluster local foi parado; a execução integral em Kubernetes e os respectivos prints ainda precisam ser refeitos em uma máquina com mais recursos.
+O Docker Compose iniciou os sete serviços persistentes, aplicou as 42 migrações e respondeu HTTP 200 na aplicação, em `/api/health` e em `/metrics`. Prometheus mostrou os três alvos `up` e séries de CPU e memória por container. O dashboard e a regra de alerta foram carregados no Grafana. Ao parar o backend, Prometheus registrou `up = 0` e o Mailpit recebeu o e-mail `[FIRING:1] Backend indisponivel`; o backend foi restaurado. Um cluster `kind-animecards` foi criado e os manifests passaram por `kubectl apply -k k8s`, mas a máquina de 8 GB ficou sem memória suficiente para concluir simultaneamente os pulls dos Pods. O cluster local foi parado; a execução integral em Kubernetes e os respectivos prints ainda precisam ser refeitos em uma máquina com mais recursos.
 
 ## Prints da entrega
 
