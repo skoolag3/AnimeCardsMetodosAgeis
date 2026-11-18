@@ -31,6 +31,6 @@ Um cluster local `kind-animecards` foi criado. A implantação em etapas conclui
 
 ## Prints da entrega
 
-As capturas principais da execução local estão em `evidencias/`: `grafana-dashboard-k8s.png`, `grafana-alertas-k8s.png`, `k8s-cluster.png` e `k8s-deployment-backend.png`. Elas mostram a aplicação disponível e a regra de alerta em estado normal. As duas imagens Kubernetes apresentam a saída real dos comandos `kubectl` indicados na própria imagem, renderizada para leitura. O documento `Relatorio_Entrega_AnimeCards_Atualizado.docx` inclui essas quatro capturas. O disparo do alerta foi validado separadamente durante uma interrupção temporária do backend, seguida de restauração; o Compose foi validado em outra execução local.
+As capturas principais da execução local estão em `evidencias/`: `grafana-dashboard-k8s.png`, `grafana-alertas-k8s.png`, `k8s-cluster.png` e `k8s-deployment-backend.png`. Elas mostram a aplicação disponível e a regra de alerta em estado normal. As duas imagens Kubernetes apresentam a saída real dos comandos `kubectl` indicados na própria imagem, renderizada para leitura. O documento `Relatorio_Entrega_AnimeCards_Simples.docx` inclui essas quatro capturas. O disparo do alerta foi validado separadamente durante uma interrupção temporária do backend, seguida de restauração; o Compose foi validado em outra execução local.
 
 O objetivo desta atividade de Métodos Ágeis é demonstrar que o ambiente e a observabilidade funcionam. Integrações externas opcionais do AnimeCards não fazem parte da validação local.
